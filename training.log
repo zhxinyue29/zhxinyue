@@ -1,0 +1,675 @@
+2025-06-03 18:37:20,286 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,286 - INFO - Epoch 1, Loss: 0.08786822110414505, Eval Loss: 0.07991722505539656
+2025-06-03 18:37:20,287 - INFO - Best model saved with loss: 0.07991722505539656
+2025-06-03 18:37:20,329 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,329 - INFO - Epoch 2, Loss: 0.0797564759850502, Eval Loss: 0.07813919172622263
+2025-06-03 18:37:20,329 - INFO - Best model saved with loss: 0.07813919172622263
+2025-06-03 18:37:20,369 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,369 - INFO - Epoch 3, Loss: 0.05734490975737572, Eval Loss: 0.07684588024858385
+2025-06-03 18:37:20,370 - INFO - Best model saved with loss: 0.07684588024858385
+2025-06-03 18:37:20,409 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,409 - INFO - Epoch 4, Loss: 0.08394203335046768, Eval Loss: 0.07596544944681227
+2025-06-03 18:37:20,410 - INFO - Best model saved with loss: 0.07596544944681227
+2025-06-03 18:37:20,449 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,449 - INFO - Epoch 5, Loss: 0.10866052657365799, Eval Loss: 0.07329232897609472
+2025-06-03 18:37:20,450 - INFO - Best model saved with loss: 0.07329232897609472
+2025-06-03 18:37:20,489 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,489 - INFO - Epoch 6, Loss: 0.08204294741153717, Eval Loss: 0.07360442692879587
+2025-06-03 18:37:20,529 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,529 - INFO - Epoch 7, Loss: 0.062314487993717194, Eval Loss: 0.07208997604902834
+2025-06-03 18:37:20,530 - INFO - Best model saved with loss: 0.07208997604902834
+2025-06-03 18:37:20,570 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,570 - INFO - Epoch 8, Loss: 0.07398118078708649, Eval Loss: 0.07576832210179418
+2025-06-03 18:37:20,610 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,610 - INFO - Epoch 9, Loss: 0.06477129459381104, Eval Loss: 0.07599879195913672
+2025-06-03 18:37:20,650 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,650 - INFO - Epoch 10, Loss: 0.06302876025438309, Eval Loss: 0.07114024611655623
+2025-06-03 18:37:20,651 - INFO - Best model saved with loss: 0.07114024611655623
+2025-06-03 18:37:20,691 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,691 - INFO - Epoch 11, Loss: 0.12654946744441986, Eval Loss: 0.06867077585775405
+2025-06-03 18:37:20,691 - INFO - Best model saved with loss: 0.06867077585775405
+2025-06-03 18:37:20,731 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,731 - INFO - Epoch 12, Loss: 0.05194814130663872, Eval Loss: 0.07506644714158028
+2025-06-03 18:37:20,771 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,771 - INFO - Epoch 13, Loss: 0.03020436502993107, Eval Loss: 0.06653055700007826
+2025-06-03 18:37:20,771 - INFO - Best model saved with loss: 0.06653055700007826
+2025-06-03 18:37:20,811 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,811 - INFO - Epoch 14, Loss: 0.11171949654817581, Eval Loss: 0.06607149611227214
+2025-06-03 18:37:20,812 - INFO - Best model saved with loss: 0.06607149611227214
+2025-06-03 18:37:20,878 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,878 - INFO - Epoch 15, Loss: 0.06974312663078308, Eval Loss: 0.06630664342083037
+2025-06-03 18:37:20,918 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,918 - INFO - Epoch 16, Loss: 0.046326104551553726, Eval Loss: 0.06346436066087335
+2025-06-03 18:37:20,919 - INFO - Best model saved with loss: 0.06346436066087335
+2025-06-03 18:37:20,959 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,959 - INFO - Epoch 17, Loss: 0.05443292111158371, Eval Loss: 0.06427220162004232
+2025-06-03 18:37:20,998 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:20,998 - INFO - Epoch 18, Loss: 0.11746031045913696, Eval Loss: 0.06183065439108759
+2025-06-03 18:37:20,999 - INFO - Best model saved with loss: 0.06183065439108759
+2025-06-03 18:37:21,038 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,038 - INFO - Epoch 19, Loss: 0.09753799438476562, Eval Loss: 0.06003708532080054
+2025-06-03 18:37:21,039 - INFO - Best model saved with loss: 0.06003708532080054
+2025-06-03 18:37:21,079 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,079 - INFO - Epoch 20, Loss: 0.03745120391249657, Eval Loss: 0.060107924276962876
+2025-06-03 18:37:21,118 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,118 - INFO - Epoch 21, Loss: 0.03519951179623604, Eval Loss: 0.06481084157712758
+2025-06-03 18:37:21,158 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,158 - INFO - Epoch 22, Loss: 0.08216448128223419, Eval Loss: 0.061023969552479684
+2025-06-03 18:37:21,198 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,198 - INFO - Epoch 23, Loss: 0.0604160875082016, Eval Loss: 0.05419741163495928
+2025-06-03 18:37:21,198 - INFO - Best model saved with loss: 0.05419741163495928
+2025-06-03 18:37:21,238 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,238 - INFO - Epoch 24, Loss: 0.06744250655174255, Eval Loss: 0.0515582375228405
+2025-06-03 18:37:21,239 - INFO - Best model saved with loss: 0.0515582375228405
+2025-06-03 18:37:21,278 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,279 - INFO - Epoch 25, Loss: 0.04278724640607834, Eval Loss: 0.04795881250174716
+2025-06-03 18:37:21,279 - INFO - Best model saved with loss: 0.04795881250174716
+2025-06-03 18:37:21,319 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,319 - INFO - Epoch 26, Loss: 0.024055741727352142, Eval Loss: 0.04644080495927483
+2025-06-03 18:37:21,319 - INFO - Best model saved with loss: 0.04644080495927483
+2025-06-03 18:37:21,359 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,359 - INFO - Epoch 27, Loss: 0.055092502385377884, Eval Loss: 0.043190800002776086
+2025-06-03 18:37:21,359 - INFO - Best model saved with loss: 0.043190800002776086
+2025-06-03 18:37:21,399 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,399 - INFO - Epoch 28, Loss: 0.04722752794623375, Eval Loss: 0.04312815360026434
+2025-06-03 18:37:21,400 - INFO - Best model saved with loss: 0.04312815360026434
+2025-06-03 18:37:21,440 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,440 - INFO - Epoch 29, Loss: 0.050113435834646225, Eval Loss: 0.039632934145629406
+2025-06-03 18:37:21,440 - INFO - Best model saved with loss: 0.039632934145629406
+2025-06-03 18:37:21,480 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,480 - INFO - Epoch 30, Loss: 0.08439239114522934, Eval Loss: 0.039144104113802314
+2025-06-03 18:37:21,480 - INFO - Best model saved with loss: 0.039144104113802314
+2025-06-03 18:37:21,520 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,520 - INFO - Epoch 31, Loss: 0.03440891206264496, Eval Loss: 0.033315421285806224
+2025-06-03 18:37:21,520 - INFO - Best model saved with loss: 0.033315421285806224
+2025-06-03 18:37:21,560 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,560 - INFO - Epoch 32, Loss: 0.04714479297399521, Eval Loss: 0.03159187128767371
+2025-06-03 18:37:21,560 - INFO - Best model saved with loss: 0.03159187128767371
+2025-06-03 18:37:21,600 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,600 - INFO - Epoch 33, Loss: 0.025695092976093292, Eval Loss: 0.029110037168720737
+2025-06-03 18:37:21,601 - INFO - Best model saved with loss: 0.029110037168720737
+2025-06-03 18:37:21,641 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,641 - INFO - Epoch 34, Loss: 0.028881462290883064, Eval Loss: 0.031118585407966748
+2025-06-03 18:37:21,681 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,681 - INFO - Epoch 35, Loss: 0.009959680959582329, Eval Loss: 0.02792471638531424
+2025-06-03 18:37:21,681 - INFO - Best model saved with loss: 0.02792471638531424
+2025-06-03 18:37:21,721 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,721 - INFO - Epoch 36, Loss: 0.01862301491200924, Eval Loss: 0.02307211671723053
+2025-06-03 18:37:21,721 - INFO - Best model saved with loss: 0.02307211671723053
+2025-06-03 18:37:21,761 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,761 - INFO - Epoch 37, Loss: 0.012480342760682106, Eval Loss: 0.021445341903017834
+2025-06-03 18:37:21,761 - INFO - Best model saved with loss: 0.021445341903017834
+2025-06-03 18:37:21,801 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,801 - INFO - Epoch 38, Loss: 0.037490591406822205, Eval Loss: 0.022071274084737524
+2025-06-03 18:37:21,841 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,841 - INFO - Epoch 39, Loss: 0.012042821384966373, Eval Loss: 0.022319309297017753
+2025-06-03 18:37:21,889 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,889 - INFO - Epoch 40, Loss: 0.014620807953178883, Eval Loss: 0.021477178641362116
+2025-06-03 18:37:21,929 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:21,929 - INFO - Epoch 41, Loss: 0.010407418943941593, Eval Loss: 0.017487390228779987
+2025-06-03 18:37:21,930 - INFO - Best model saved with loss: 0.017487390228779987
+2025-06-03 18:37:22,080 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,080 - INFO - Epoch 42, Loss: 0.02629716508090496, Eval Loss: 0.0161205686890753
+2025-06-03 18:37:22,081 - INFO - Best model saved with loss: 0.0161205686890753
+2025-06-03 18:37:22,122 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,122 - INFO - Epoch 43, Loss: 0.010594955645501614, Eval Loss: 0.0136266874615103
+2025-06-03 18:37:22,122 - INFO - Best model saved with loss: 0.0136266874615103
+2025-06-03 18:37:22,162 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,162 - INFO - Epoch 44, Loss: 0.023118697106838226, Eval Loss: 0.011807254675659351
+2025-06-03 18:37:22,162 - INFO - Best model saved with loss: 0.011807254675659351
+2025-06-03 18:37:22,202 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,202 - INFO - Epoch 45, Loss: 0.006110269110649824, Eval Loss: 0.01159476552857086
+2025-06-03 18:37:22,202 - INFO - Best model saved with loss: 0.01159476552857086
+2025-06-03 18:37:22,242 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,242 - INFO - Epoch 46, Loss: 0.020390506833791733, Eval Loss: 0.01030430405808147
+2025-06-03 18:37:22,242 - INFO - Best model saved with loss: 0.01030430405808147
+2025-06-03 18:37:22,282 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,282 - INFO - Epoch 47, Loss: 0.007669847924262285, Eval Loss: 0.010598561828373931
+2025-06-03 18:37:22,322 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,322 - INFO - Epoch 48, Loss: 0.011979514732956886, Eval Loss: 0.010126147186383605
+2025-06-03 18:37:22,322 - INFO - Best model saved with loss: 0.010126147186383605
+2025-06-03 18:37:22,362 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,362 - INFO - Epoch 49, Loss: 0.011230899021029472, Eval Loss: 0.010254628214170225
+2025-06-03 18:37:22,402 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:37:22,402 - INFO - Epoch 50, Loss: 0.012359203770756721, Eval Loss: 0.00910767403547652
+2025-06-03 18:37:22,402 - INFO - Best model saved with loss: 0.00910767403547652
+2025-06-03 18:38:19,333 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,334 - INFO - Epoch 1, Loss: 0.05553734302520752, Eval Loss: 0.0849359225248918
+2025-06-03 18:38:19,334 - INFO - Best model saved with loss: 0.0849359225248918
+2025-06-03 18:38:19,378 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,378 - INFO - Epoch 2, Loss: 0.08110316842794418, Eval Loss: 0.08654177002608776
+2025-06-03 18:38:19,424 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,424 - INFO - Epoch 3, Loss: 0.0822659358382225, Eval Loss: 0.08508533553685993
+2025-06-03 18:38:19,467 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,468 - INFO - Epoch 4, Loss: 0.11340685188770294, Eval Loss: 0.08363659074530005
+2025-06-03 18:38:19,468 - INFO - Best model saved with loss: 0.08363659074530005
+2025-06-03 18:38:19,511 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,511 - INFO - Epoch 5, Loss: 0.1382613629102707, Eval Loss: 0.08445257844869047
+2025-06-03 18:38:19,555 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,555 - INFO - Epoch 6, Loss: 0.06738430261611938, Eval Loss: 0.08211098704487085
+2025-06-03 18:38:19,555 - INFO - Best model saved with loss: 0.08211098704487085
+2025-06-03 18:38:19,602 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,602 - INFO - Epoch 7, Loss: 0.1159994900226593, Eval Loss: 0.08512283873278648
+2025-06-03 18:38:19,644 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,644 - INFO - Epoch 8, Loss: 0.07114531099796295, Eval Loss: 0.08238315407652408
+2025-06-03 18:38:19,685 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,686 - INFO - Epoch 9, Loss: 0.08639278262853622, Eval Loss: 0.08207656629383564
+2025-06-03 18:38:19,686 - INFO - Best model saved with loss: 0.08207656629383564
+2025-06-03 18:38:19,729 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,729 - INFO - Epoch 10, Loss: 0.0838155746459961, Eval Loss: 0.08070907846558839
+2025-06-03 18:38:19,730 - INFO - Best model saved with loss: 0.08070907846558839
+2025-06-03 18:38:19,771 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,772 - INFO - Epoch 11, Loss: 0.08796995133161545, Eval Loss: 0.08161897072568536
+2025-06-03 18:38:19,817 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,818 - INFO - Epoch 12, Loss: 0.07950469106435776, Eval Loss: 0.07911040307953954
+2025-06-03 18:38:19,818 - INFO - Best model saved with loss: 0.07911040307953954
+2025-06-03 18:38:19,862 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,862 - INFO - Epoch 13, Loss: 0.05584930628538132, Eval Loss: 0.07819387316703796
+2025-06-03 18:38:19,863 - INFO - Best model saved with loss: 0.07819387316703796
+2025-06-03 18:38:19,910 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,910 - INFO - Epoch 14, Loss: 0.06685017049312592, Eval Loss: 0.07782493811100721
+2025-06-03 18:38:19,911 - INFO - Best model saved with loss: 0.07782493811100721
+2025-06-03 18:38:19,957 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:19,957 - INFO - Epoch 15, Loss: 0.07063671946525574, Eval Loss: 0.07589441980235279
+2025-06-03 18:38:19,958 - INFO - Best model saved with loss: 0.07589441980235279
+2025-06-03 18:38:20,000 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,000 - INFO - Epoch 16, Loss: 0.05886082723736763, Eval Loss: 0.08153403119649738
+2025-06-03 18:38:20,041 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,041 - INFO - Epoch 17, Loss: 0.07977092266082764, Eval Loss: 0.0743242873577401
+2025-06-03 18:38:20,041 - INFO - Best model saved with loss: 0.0743242873577401
+2025-06-03 18:38:20,081 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,081 - INFO - Epoch 18, Loss: 0.08782771974802017, Eval Loss: 0.07502855698112398
+2025-06-03 18:38:20,122 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,122 - INFO - Epoch 19, Loss: 0.07421522587537766, Eval Loss: 0.0719886050792411
+2025-06-03 18:38:20,122 - INFO - Best model saved with loss: 0.0719886050792411
+2025-06-03 18:38:20,162 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,162 - INFO - Epoch 20, Loss: 0.08682503551244736, Eval Loss: 0.07245226739905775
+2025-06-03 18:38:20,203 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,203 - INFO - Epoch 21, Loss: 0.0684870034456253, Eval Loss: 0.06950691889505833
+2025-06-03 18:38:20,204 - INFO - Best model saved with loss: 0.06950691889505833
+2025-06-03 18:38:20,247 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,247 - INFO - Epoch 22, Loss: 0.058355607092380524, Eval Loss: 0.06815204489976168
+2025-06-03 18:38:20,247 - INFO - Best model saved with loss: 0.06815204489976168
+2025-06-03 18:38:20,289 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,289 - INFO - Epoch 23, Loss: 0.06140977144241333, Eval Loss: 0.07581366098020226
+2025-06-03 18:38:20,331 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,331 - INFO - Epoch 24, Loss: 0.10323916375637054, Eval Loss: 0.06835689907893538
+2025-06-03 18:38:20,372 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,372 - INFO - Epoch 25, Loss: 0.08263878524303436, Eval Loss: 0.06717915763147175
+2025-06-03 18:38:20,372 - INFO - Best model saved with loss: 0.06717915763147175
+2025-06-03 18:38:20,416 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,416 - INFO - Epoch 26, Loss: 0.07327954471111298, Eval Loss: 0.06294762488687411
+2025-06-03 18:38:20,417 - INFO - Best model saved with loss: 0.06294762488687411
+2025-06-03 18:38:20,458 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,458 - INFO - Epoch 27, Loss: 0.03817279264330864, Eval Loss: 0.06257359648589045
+2025-06-03 18:38:20,459 - INFO - Best model saved with loss: 0.06257359648589045
+2025-06-03 18:38:20,499 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,499 - INFO - Epoch 28, Loss: 0.06557080894708633, Eval Loss: 0.05837380129378289
+2025-06-03 18:38:20,499 - INFO - Best model saved with loss: 0.05837380129378289
+2025-06-03 18:38:20,539 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,539 - INFO - Epoch 29, Loss: 0.030248373746871948, Eval Loss: 0.05526695121079683
+2025-06-03 18:38:20,539 - INFO - Best model saved with loss: 0.05526695121079683
+2025-06-03 18:38:20,580 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,580 - INFO - Epoch 30, Loss: 0.07713458687067032, Eval Loss: 0.05363317998126149
+2025-06-03 18:38:20,581 - INFO - Best model saved with loss: 0.05363317998126149
+2025-06-03 18:38:20,621 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,621 - INFO - Epoch 31, Loss: 0.02640983834862709, Eval Loss: 0.05110801383852959
+2025-06-03 18:38:20,621 - INFO - Best model saved with loss: 0.05110801383852959
+2025-06-03 18:38:20,661 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,661 - INFO - Epoch 32, Loss: 0.08401469886302948, Eval Loss: 0.04880362143740058
+2025-06-03 18:38:20,662 - INFO - Best model saved with loss: 0.04880362143740058
+2025-06-03 18:38:20,702 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,702 - INFO - Epoch 33, Loss: 0.06292135268449783, Eval Loss: 0.045692185463849455
+2025-06-03 18:38:20,703 - INFO - Best model saved with loss: 0.045692185463849455
+2025-06-03 18:38:20,743 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,743 - INFO - Epoch 34, Loss: 0.07745591551065445, Eval Loss: 0.042359970801044255
+2025-06-03 18:38:20,743 - INFO - Best model saved with loss: 0.042359970801044255
+2025-06-03 18:38:20,783 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,783 - INFO - Epoch 35, Loss: 0.03066929802298546, Eval Loss: 0.04196098406100646
+2025-06-03 18:38:20,784 - INFO - Best model saved with loss: 0.04196098406100646
+2025-06-03 18:38:20,823 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,824 - INFO - Epoch 36, Loss: 0.04614580422639847, Eval Loss: 0.047921242425218225
+2025-06-03 18:38:20,864 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,864 - INFO - Epoch 37, Loss: 0.061526719480752945, Eval Loss: 0.039250022266060114
+2025-06-03 18:38:20,864 - INFO - Best model saved with loss: 0.039250022266060114
+2025-06-03 18:38:20,904 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,904 - INFO - Epoch 38, Loss: 0.07213354110717773, Eval Loss: 0.03727761679328978
+2025-06-03 18:38:20,905 - INFO - Best model saved with loss: 0.03727761679328978
+2025-06-03 18:38:20,945 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,945 - INFO - Epoch 39, Loss: 0.034922920167446136, Eval Loss: 0.03478610148886219
+2025-06-03 18:38:20,945 - INFO - Best model saved with loss: 0.03478610148886219
+2025-06-03 18:38:20,985 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:20,985 - INFO - Epoch 40, Loss: 0.013649829663336277, Eval Loss: 0.030949539272114635
+2025-06-03 18:38:20,985 - INFO - Best model saved with loss: 0.030949539272114635
+2025-06-03 18:38:21,025 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,026 - INFO - Epoch 41, Loss: 0.037444107234478, Eval Loss: 0.03716144722420722
+2025-06-03 18:38:21,065 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,066 - INFO - Epoch 42, Loss: 0.01262124814093113, Eval Loss: 0.030217316234484315
+2025-06-03 18:38:21,066 - INFO - Best model saved with loss: 0.030217316234484315
+2025-06-03 18:38:21,106 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,106 - INFO - Epoch 43, Loss: 0.008110304363071918, Eval Loss: 0.02498850697884336
+2025-06-03 18:38:21,106 - INFO - Best model saved with loss: 0.02498850697884336
+2025-06-03 18:38:21,146 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,147 - INFO - Epoch 44, Loss: 0.04902579262852669, Eval Loss: 0.025649591349065304
+2025-06-03 18:38:21,222 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,222 - INFO - Epoch 45, Loss: 0.0333053283393383, Eval Loss: 0.019778881571255624
+2025-06-03 18:38:21,223 - INFO - Best model saved with loss: 0.019778881571255624
+2025-06-03 18:38:21,262 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,262 - INFO - Epoch 46, Loss: 0.028034832328557968, Eval Loss: 0.021159211435588077
+2025-06-03 18:38:21,302 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,302 - INFO - Epoch 47, Loss: 0.01528635062277317, Eval Loss: 0.022217836958589032
+2025-06-03 18:38:21,342 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,342 - INFO - Epoch 48, Loss: 0.00719508295878768, Eval Loss: 0.018675493833143264
+2025-06-03 18:38:21,342 - INFO - Best model saved with loss: 0.018675493833143264
+2025-06-03 18:38:21,382 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,382 - INFO - Epoch 49, Loss: 0.010538135655224323, Eval Loss: 0.02631929883500561
+2025-06-03 18:38:21,422 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:38:21,422 - INFO - Epoch 50, Loss: 0.023768221959471703, Eval Loss: 0.014492091810097918
+2025-06-03 18:38:21,422 - INFO - Best model saved with loss: 0.014492091810097918
+2025-06-03 18:39:33,920 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:33,920 - INFO - Epoch 1, Loss: 0.12423403561115265, Eval Loss: 0.08540899446234107
+2025-06-03 18:39:33,921 - INFO - Best model saved with loss: 0.08540899446234107
+2025-06-03 18:39:33,961 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:33,961 - INFO - Epoch 2, Loss: 0.03795870766043663, Eval Loss: 0.08366118941921741
+2025-06-03 18:39:33,961 - INFO - Best model saved with loss: 0.08366118941921741
+2025-06-03 18:39:34,001 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,001 - INFO - Epoch 3, Loss: 0.13933052122592926, Eval Loss: 0.08138073096051812
+2025-06-03 18:39:34,001 - INFO - Best model saved with loss: 0.08138073096051812
+2025-06-03 18:39:34,041 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,041 - INFO - Epoch 4, Loss: 0.0730760395526886, Eval Loss: 0.08248630654998124
+2025-06-03 18:39:34,081 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,081 - INFO - Epoch 5, Loss: 0.055060870945453644, Eval Loss: 0.08060354099143296
+2025-06-03 18:39:34,081 - INFO - Best model saved with loss: 0.08060354099143296
+2025-06-03 18:39:34,121 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,121 - INFO - Epoch 6, Loss: 0.09001919627189636, Eval Loss: 0.07947136810980737
+2025-06-03 18:39:34,121 - INFO - Best model saved with loss: 0.07947136810980737
+2025-06-03 18:39:34,161 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,161 - INFO - Epoch 7, Loss: 0.09032945334911346, Eval Loss: 0.08100303751416504
+2025-06-03 18:39:34,201 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,201 - INFO - Epoch 8, Loss: 0.054602403193712234, Eval Loss: 0.07928024267312139
+2025-06-03 18:39:34,201 - INFO - Best model saved with loss: 0.07928024267312139
+2025-06-03 18:39:34,241 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,241 - INFO - Epoch 9, Loss: 0.04441441223025322, Eval Loss: 0.07811250642407686
+2025-06-03 18:39:34,241 - INFO - Best model saved with loss: 0.07811250642407686
+2025-06-03 18:39:34,281 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,282 - INFO - Epoch 10, Loss: 0.055924221873283386, Eval Loss: 0.07917103078216314
+2025-06-03 18:39:34,321 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,321 - INFO - Epoch 11, Loss: 0.07655531167984009, Eval Loss: 0.07528698595706373
+2025-06-03 18:39:34,322 - INFO - Best model saved with loss: 0.07528698595706373
+2025-06-03 18:39:34,362 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,362 - INFO - Epoch 12, Loss: 0.05752965807914734, Eval Loss: 0.07431857008486986
+2025-06-03 18:39:34,362 - INFO - Best model saved with loss: 0.07431857008486986
+2025-06-03 18:39:34,402 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,402 - INFO - Epoch 13, Loss: 0.0833238959312439, Eval Loss: 0.07814565859735012
+2025-06-03 18:39:34,442 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,442 - INFO - Epoch 14, Loss: 0.055700160562992096, Eval Loss: 0.07476841739844531
+2025-06-03 18:39:34,482 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,482 - INFO - Epoch 15, Loss: 0.06375866383314133, Eval Loss: 0.07276358874514699
+2025-06-03 18:39:34,482 - INFO - Best model saved with loss: 0.07276358874514699
+2025-06-03 18:39:34,522 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,522 - INFO - Epoch 16, Loss: 0.060091376304626465, Eval Loss: 0.07336597261019051
+2025-06-03 18:39:34,562 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,562 - INFO - Epoch 17, Loss: 0.07861460000276566, Eval Loss: 0.07425066630821675
+2025-06-03 18:39:34,602 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,602 - INFO - Epoch 18, Loss: 0.07554242014884949, Eval Loss: 0.0703926698770374
+2025-06-03 18:39:34,603 - INFO - Best model saved with loss: 0.0703926698770374
+2025-06-03 18:39:34,643 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,643 - INFO - Epoch 19, Loss: 0.09366223216056824, Eval Loss: 0.06894103239756078
+2025-06-03 18:39:34,643 - INFO - Best model saved with loss: 0.06894103239756078
+2025-06-03 18:39:34,683 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,683 - INFO - Epoch 20, Loss: 0.0344601608812809, Eval Loss: 0.0678502464434132
+2025-06-03 18:39:34,684 - INFO - Best model saved with loss: 0.0678502464434132
+2025-06-03 18:39:34,724 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,724 - INFO - Epoch 21, Loss: 0.07223927229642868, Eval Loss: 0.06876276060938835
+2025-06-03 18:39:34,764 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,764 - INFO - Epoch 22, Loss: 0.04213394224643707, Eval Loss: 0.06380137649830431
+2025-06-03 18:39:34,764 - INFO - Best model saved with loss: 0.06380137649830431
+2025-06-03 18:39:34,804 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,804 - INFO - Epoch 23, Loss: 0.035456497222185135, Eval Loss: 0.06579768529627472
+2025-06-03 18:39:34,844 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,844 - INFO - Epoch 24, Loss: 0.05738643556833267, Eval Loss: 0.06771470792591572
+2025-06-03 18:39:34,884 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,884 - INFO - Epoch 25, Loss: 0.05566217005252838, Eval Loss: 0.06463587866164744
+2025-06-03 18:39:34,924 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,924 - INFO - Epoch 26, Loss: 0.08536062389612198, Eval Loss: 0.057093599578365684
+2025-06-03 18:39:34,925 - INFO - Best model saved with loss: 0.057093599578365684
+2025-06-03 18:39:34,965 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:34,965 - INFO - Epoch 27, Loss: 0.024282338097691536, Eval Loss: 0.05849293654318899
+2025-06-03 18:39:35,005 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,005 - INFO - Epoch 28, Loss: 0.03384247422218323, Eval Loss: 0.05513517395593226
+2025-06-03 18:39:35,005 - INFO - Best model saved with loss: 0.05513517395593226
+2025-06-03 18:39:35,045 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,046 - INFO - Epoch 29, Loss: 0.023095913231372833, Eval Loss: 0.0585779877146706
+2025-06-03 18:39:35,086 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,086 - INFO - Epoch 30, Loss: 0.07986386120319366, Eval Loss: 0.04978508350905031
+2025-06-03 18:39:35,086 - INFO - Best model saved with loss: 0.04978508350905031
+2025-06-03 18:39:35,126 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,126 - INFO - Epoch 31, Loss: 0.04853839427232742, Eval Loss: 0.05198695219587535
+2025-06-03 18:39:35,166 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,166 - INFO - Epoch 32, Loss: 0.05599431321024895, Eval Loss: 0.044703563617076725
+2025-06-03 18:39:35,166 - INFO - Best model saved with loss: 0.044703563617076725
+2025-06-03 18:39:35,206 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,206 - INFO - Epoch 33, Loss: 0.0699993222951889, Eval Loss: 0.04830196063267067
+2025-06-03 18:39:35,247 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,247 - INFO - Epoch 34, Loss: 0.06410545855760574, Eval Loss: 0.038407677493523806
+2025-06-03 18:39:35,247 - INFO - Best model saved with loss: 0.038407677493523806
+2025-06-03 18:39:35,287 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,287 - INFO - Epoch 35, Loss: 0.04828881099820137, Eval Loss: 0.04419554554624483
+2025-06-03 18:39:35,327 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,327 - INFO - Epoch 36, Loss: 0.036017533391714096, Eval Loss: 0.03901162027614191
+2025-06-03 18:39:35,367 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,367 - INFO - Epoch 37, Loss: 0.03789346292614937, Eval Loss: 0.033217805612366647
+2025-06-03 18:39:35,368 - INFO - Best model saved with loss: 0.033217805612366647
+2025-06-03 18:39:35,408 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,408 - INFO - Epoch 38, Loss: 0.02606867253780365, Eval Loss: 0.03388395986985415
+2025-06-03 18:39:35,448 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,448 - INFO - Epoch 39, Loss: 0.015567314811050892, Eval Loss: 0.04150999413104728
+2025-06-03 18:39:35,488 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,488 - INFO - Epoch 40, Loss: 0.01692810468375683, Eval Loss: 0.033355510502588004
+2025-06-03 18:39:35,528 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,528 - INFO - Epoch 41, Loss: 0.02011297456920147, Eval Loss: 0.030764901894144714
+2025-06-03 18:39:35,529 - INFO - Best model saved with loss: 0.030764901894144714
+2025-06-03 18:39:35,569 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,569 - INFO - Epoch 42, Loss: 0.060711003839969635, Eval Loss: 0.026563889405224472
+2025-06-03 18:39:35,569 - INFO - Best model saved with loss: 0.026563889405224472
+2025-06-03 18:39:35,616 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,616 - INFO - Epoch 43, Loss: 0.024254348129034042, Eval Loss: 0.03645004564896226
+2025-06-03 18:39:35,656 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,656 - INFO - Epoch 44, Loss: 0.07799127697944641, Eval Loss: 0.022996085870545357
+2025-06-03 18:39:35,656 - INFO - Best model saved with loss: 0.022996085870545357
+2025-06-03 18:39:35,696 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,696 - INFO - Epoch 45, Loss: 0.046981919556856155, Eval Loss: 0.022323009034153074
+2025-06-03 18:39:35,697 - INFO - Best model saved with loss: 0.022323009034153074
+2025-06-03 18:39:35,737 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,737 - INFO - Epoch 46, Loss: 0.004340747371315956, Eval Loss: 0.025452465080888942
+2025-06-03 18:39:35,777 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,777 - INFO - Epoch 47, Loss: 0.026317594572901726, Eval Loss: 0.020633667707443237
+2025-06-03 18:39:35,777 - INFO - Best model saved with loss: 0.020633667707443237
+2025-06-03 18:39:35,817 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,817 - INFO - Epoch 48, Loss: 0.013524438254535198, Eval Loss: 0.019709152315044776
+2025-06-03 18:39:35,817 - INFO - Best model saved with loss: 0.019709152315044776
+2025-06-03 18:39:35,857 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,857 - INFO - Epoch 49, Loss: 0.010694590397179127, Eval Loss: 0.018489412759663537
+2025-06-03 18:39:35,858 - INFO - Best model saved with loss: 0.018489412759663537
+2025-06-03 18:39:35,898 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:39:35,898 - INFO - Epoch 50, Loss: 0.02091776393353939, Eval Loss: 0.019590138632338494
+2025-06-03 18:39:35,924 - INFO - Filtered data saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,709 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,710 - INFO - Epoch 1, Loss: 0.08546455949544907, Eval Loss: 0.08791091642342508
+2025-06-03 18:41:59,710 - INFO - Best model saved with loss: 0.08791091642342508
+2025-06-03 18:41:59,750 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,750 - INFO - Epoch 2, Loss: 0.1002654954791069, Eval Loss: 0.08888954564463347
+2025-06-03 18:41:59,790 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,790 - INFO - Epoch 3, Loss: 0.0718914195895195, Eval Loss: 0.08442370314151049
+2025-06-03 18:41:59,791 - INFO - Best model saved with loss: 0.08442370314151049
+2025-06-03 18:41:59,831 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,831 - INFO - Epoch 4, Loss: 0.05290466174483299, Eval Loss: 0.08236952254083008
+2025-06-03 18:41:59,831 - INFO - Best model saved with loss: 0.08236952254083008
+2025-06-03 18:41:59,871 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,871 - INFO - Epoch 5, Loss: 0.07587523013353348, Eval Loss: 0.08116695168428123
+2025-06-03 18:41:59,871 - INFO - Best model saved with loss: 0.08116695168428123
+2025-06-03 18:41:59,911 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,911 - INFO - Epoch 6, Loss: 0.06590408086776733, Eval Loss: 0.07857211318332702
+2025-06-03 18:41:59,912 - INFO - Best model saved with loss: 0.07857211318332702
+2025-06-03 18:41:59,952 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,952 - INFO - Epoch 7, Loss: 0.12081919610500336, Eval Loss: 0.0787179060280323
+2025-06-03 18:41:59,992 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:41:59,992 - INFO - Epoch 8, Loss: 0.055808573961257935, Eval Loss: 0.08449129399377853
+2025-06-03 18:42:00,032 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,032 - INFO - Epoch 9, Loss: 0.04581865668296814, Eval Loss: 0.07462933810893446
+2025-06-03 18:42:00,032 - INFO - Best model saved with loss: 0.07462933810893446
+2025-06-03 18:42:00,073 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,073 - INFO - Epoch 10, Loss: 0.0716824010014534, Eval Loss: 0.07237213337793946
+2025-06-03 18:42:00,073 - INFO - Best model saved with loss: 0.07237213337793946
+2025-06-03 18:42:00,113 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,113 - INFO - Epoch 11, Loss: 0.03724832832813263, Eval Loss: 0.07236110302619636
+2025-06-03 18:42:00,114 - INFO - Best model saved with loss: 0.07236110302619636
+2025-06-03 18:42:00,154 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,154 - INFO - Epoch 12, Loss: 0.06254494935274124, Eval Loss: 0.06934644957073033
+2025-06-03 18:42:00,154 - INFO - Best model saved with loss: 0.06934644957073033
+2025-06-03 18:42:00,195 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,195 - INFO - Epoch 13, Loss: 0.15853655338287354, Eval Loss: 0.0770178654929623
+2025-06-03 18:42:00,235 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,236 - INFO - Epoch 14, Loss: 0.12157545238733292, Eval Loss: 0.06919599266257137
+2025-06-03 18:42:00,236 - INFO - Best model saved with loss: 0.06919599266257137
+2025-06-03 18:42:00,276 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,276 - INFO - Epoch 15, Loss: 0.06623151153326035, Eval Loss: 0.06412006646860391
+2025-06-03 18:42:00,277 - INFO - Best model saved with loss: 0.06412006646860391
+2025-06-03 18:42:00,317 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,317 - INFO - Epoch 16, Loss: 0.041322432458400726, Eval Loss: 0.06041077454574406
+2025-06-03 18:42:00,317 - INFO - Best model saved with loss: 0.06041077454574406
+2025-06-03 18:42:00,357 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,357 - INFO - Epoch 17, Loss: 0.06144176051020622, Eval Loss: 0.05776277102995664
+2025-06-03 18:42:00,357 - INFO - Best model saved with loss: 0.05776277102995664
+2025-06-03 18:42:00,398 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,398 - INFO - Epoch 18, Loss: 0.07219014316797256, Eval Loss: 0.054732462973333895
+2025-06-03 18:42:00,398 - INFO - Best model saved with loss: 0.054732462973333895
+2025-06-03 18:42:00,438 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,438 - INFO - Epoch 19, Loss: 0.02579122968018055, Eval Loss: 0.053826128132641315
+2025-06-03 18:42:00,439 - INFO - Best model saved with loss: 0.053826128132641315
+2025-06-03 18:42:00,478 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,478 - INFO - Epoch 20, Loss: 0.09202733635902405, Eval Loss: 0.048041643225587904
+2025-06-03 18:42:00,479 - INFO - Best model saved with loss: 0.048041643225587904
+2025-06-03 18:42:00,518 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,518 - INFO - Epoch 21, Loss: 0.04271635785698891, Eval Loss: 0.046306617674417794
+2025-06-03 18:42:00,519 - INFO - Best model saved with loss: 0.046306617674417794
+2025-06-03 18:42:00,559 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,559 - INFO - Epoch 22, Loss: 0.052642181515693665, Eval Loss: 0.042973559349775314
+2025-06-03 18:42:00,559 - INFO - Best model saved with loss: 0.042973559349775314
+2025-06-03 18:42:00,599 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,599 - INFO - Epoch 23, Loss: 0.06103724613785744, Eval Loss: 0.04404408030677587
+2025-06-03 18:42:00,640 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,640 - INFO - Epoch 24, Loss: 0.0654112696647644, Eval Loss: 0.04004498809808865
+2025-06-03 18:42:00,640 - INFO - Best model saved with loss: 0.04004498809808865
+2025-06-03 18:42:00,680 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,680 - INFO - Epoch 25, Loss: 0.024384476244449615, Eval Loss: 0.03799083869671449
+2025-06-03 18:42:00,681 - INFO - Best model saved with loss: 0.03799083869671449
+2025-06-03 18:42:00,721 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,721 - INFO - Epoch 26, Loss: 0.0496065691113472, Eval Loss: 0.03136204200563952
+2025-06-03 18:42:00,721 - INFO - Best model saved with loss: 0.03136204200563952
+2025-06-03 18:42:00,761 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,761 - INFO - Epoch 27, Loss: 0.02055411785840988, Eval Loss: 0.029122373700374737
+2025-06-03 18:42:00,761 - INFO - Best model saved with loss: 0.029122373700374737
+2025-06-03 18:42:00,801 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,801 - INFO - Epoch 28, Loss: 0.022414693608880043, Eval Loss: 0.04087382642319426
+2025-06-03 18:42:00,842 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,842 - INFO - Epoch 29, Loss: 0.03192513808608055, Eval Loss: 0.02372793888207525
+2025-06-03 18:42:00,842 - INFO - Best model saved with loss: 0.02372793888207525
+2025-06-03 18:42:00,882 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,882 - INFO - Epoch 30, Loss: 0.014574836939573288, Eval Loss: 0.022299974807538092
+2025-06-03 18:42:00,883 - INFO - Best model saved with loss: 0.022299974807538092
+2025-06-03 18:42:00,923 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,923 - INFO - Epoch 31, Loss: 0.022619731724262238, Eval Loss: 0.021544847870245576
+2025-06-03 18:42:00,923 - INFO - Best model saved with loss: 0.021544847870245576
+2025-06-03 18:42:00,963 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:00,963 - INFO - Epoch 32, Loss: 0.029010623693466187, Eval Loss: 0.018770734255667776
+2025-06-03 18:42:00,964 - INFO - Best model saved with loss: 0.018770734255667776
+2025-06-03 18:42:01,004 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,005 - INFO - Epoch 33, Loss: 0.02332528680562973, Eval Loss: 0.015866379981162027
+2025-06-03 18:42:01,005 - INFO - Best model saved with loss: 0.015866379981162027
+2025-06-03 18:42:01,045 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,045 - INFO - Epoch 34, Loss: 0.015498418360948563, Eval Loss: 0.01694777121883817
+2025-06-03 18:42:01,085 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,085 - INFO - Epoch 35, Loss: 0.012744225561618805, Eval Loss: 0.014411491792998277
+2025-06-03 18:42:01,086 - INFO - Best model saved with loss: 0.014411491792998277
+2025-06-03 18:42:01,126 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,126 - INFO - Epoch 36, Loss: 0.016519512981176376, Eval Loss: 0.011984204727923498
+2025-06-03 18:42:01,126 - INFO - Best model saved with loss: 0.011984204727923498
+2025-06-03 18:42:01,166 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,166 - INFO - Epoch 37, Loss: 0.01980990543961525, Eval Loss: 0.011036634488846175
+2025-06-03 18:42:01,167 - INFO - Best model saved with loss: 0.011036634488846175
+2025-06-03 18:42:01,207 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,207 - INFO - Epoch 38, Loss: 0.006415191106498241, Eval Loss: 0.010093004908412695
+2025-06-03 18:42:01,207 - INFO - Best model saved with loss: 0.010093004908412695
+2025-06-03 18:42:01,247 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,247 - INFO - Epoch 39, Loss: 0.00603555329144001, Eval Loss: 0.008363373024621978
+2025-06-03 18:42:01,248 - INFO - Best model saved with loss: 0.008363373024621978
+2025-06-03 18:42:01,288 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,288 - INFO - Epoch 40, Loss: 0.008459880948066711, Eval Loss: 0.008807973586954176
+2025-06-03 18:42:01,328 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,328 - INFO - Epoch 41, Loss: 0.011285578832030296, Eval Loss: 0.009619011776521802
+2025-06-03 18:42:01,368 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,368 - INFO - Epoch 42, Loss: 0.004044074099510908, Eval Loss: 0.006931433861609548
+2025-06-03 18:42:01,368 - INFO - Best model saved with loss: 0.006931433861609548
+2025-06-03 18:42:01,446 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,446 - INFO - Epoch 43, Loss: 0.006776697468012571, Eval Loss: 0.00566519166022772
+2025-06-03 18:42:01,446 - INFO - Best model saved with loss: 0.00566519166022772
+2025-06-03 18:42:01,486 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,487 - INFO - Epoch 44, Loss: 0.0068191224709153175, Eval Loss: 0.005564636521739885
+2025-06-03 18:42:01,487 - INFO - Best model saved with loss: 0.005564636521739885
+2025-06-03 18:42:01,527 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,527 - INFO - Epoch 45, Loss: 0.00803679320961237, Eval Loss: 0.006407985456462484
+2025-06-03 18:42:01,567 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,567 - INFO - Epoch 46, Loss: 0.008530323393642902, Eval Loss: 0.005062413823907264
+2025-06-03 18:42:01,568 - INFO - Best model saved with loss: 0.005062413823907264
+2025-06-03 18:42:01,608 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,608 - INFO - Epoch 47, Loss: 0.0039373598992824554, Eval Loss: 0.0040143465012079105
+2025-06-03 18:42:01,608 - INFO - Best model saved with loss: 0.0040143465012079105
+2025-06-03 18:42:01,648 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,648 - INFO - Epoch 48, Loss: 0.0038739016745239496, Eval Loss: 0.0036735435569426045
+2025-06-03 18:42:01,648 - INFO - Best model saved with loss: 0.0036735435569426045
+2025-06-03 18:42:01,688 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,688 - INFO - Epoch 49, Loss: 0.010553646832704544, Eval Loss: 0.003137062900350429
+2025-06-03 18:42:01,689 - INFO - Best model saved with loss: 0.003137062900350429
+2025-06-03 18:42:01,729 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:42:01,729 - INFO - Epoch 50, Loss: 0.004281540401279926, Eval Loss: 0.004043499196995981
+2025-06-03 18:42:01,757 - INFO - Filtered data saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:36,943 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:36,943 - INFO - Epoch 1, Loss: 0.03913355618715286, Eval Loss: 0.0849836845882237
+2025-06-03 18:51:36,943 - INFO - Best model saved with loss: 0.0849836845882237
+2025-06-03 18:51:36,984 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:36,984 - INFO - Epoch 2, Loss: 0.047336652874946594, Eval Loss: 0.08285902091301978
+2025-06-03 18:51:36,984 - INFO - Best model saved with loss: 0.08285902091301978
+2025-06-03 18:51:37,028 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,028 - INFO - Epoch 3, Loss: 0.10590574145317078, Eval Loss: 0.08132703136652708
+2025-06-03 18:51:37,028 - INFO - Best model saved with loss: 0.08132703136652708
+2025-06-03 18:51:37,068 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,068 - INFO - Epoch 4, Loss: 0.06435336917638779, Eval Loss: 0.079858397715725
+2025-06-03 18:51:37,069 - INFO - Best model saved with loss: 0.079858397715725
+2025-06-03 18:51:37,109 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,109 - INFO - Epoch 5, Loss: 0.11709941923618317, Eval Loss: 0.07952650636434555
+2025-06-03 18:51:37,109 - INFO - Best model saved with loss: 0.07952650636434555
+2025-06-03 18:51:37,149 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,150 - INFO - Epoch 6, Loss: 0.13864019513130188, Eval Loss: 0.07915722276084125
+2025-06-03 18:51:37,150 - INFO - Best model saved with loss: 0.07915722276084125
+2025-06-03 18:51:37,190 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,190 - INFO - Epoch 7, Loss: 0.07440446317195892, Eval Loss: 0.07813057384919375
+2025-06-03 18:51:37,190 - INFO - Best model saved with loss: 0.07813057384919375
+2025-06-03 18:51:37,232 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,232 - INFO - Epoch 8, Loss: 0.1108764111995697, Eval Loss: 0.0820466837612912
+2025-06-03 18:51:37,272 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,272 - INFO - Epoch 9, Loss: 0.08436146378517151, Eval Loss: 0.07538018783088773
+2025-06-03 18:51:37,273 - INFO - Best model saved with loss: 0.07538018783088773
+2025-06-03 18:51:37,313 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,313 - INFO - Epoch 10, Loss: 0.07032421231269836, Eval Loss: 0.07381333620287478
+2025-06-03 18:51:37,313 - INFO - Best model saved with loss: 0.07381333620287478
+2025-06-03 18:51:37,354 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,354 - INFO - Epoch 11, Loss: 0.1094818264245987, Eval Loss: 0.07381370000075549
+2025-06-03 18:51:37,394 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,394 - INFO - Epoch 12, Loss: 0.05711847543716431, Eval Loss: 0.07334155682474375
+2025-06-03 18:51:37,394 - INFO - Best model saved with loss: 0.07334155682474375
+2025-06-03 18:51:37,435 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,435 - INFO - Epoch 13, Loss: 0.05409801006317139, Eval Loss: 0.07322301145177335
+2025-06-03 18:51:37,435 - INFO - Best model saved with loss: 0.07322301145177335
+2025-06-03 18:51:37,475 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,475 - INFO - Epoch 14, Loss: 0.07056383043527603, Eval Loss: 0.07066226098686457
+2025-06-03 18:51:37,475 - INFO - Best model saved with loss: 0.07066226098686457
+2025-06-03 18:51:37,516 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,516 - INFO - Epoch 15, Loss: 0.08432399481534958, Eval Loss: 0.06948149565141648
+2025-06-03 18:51:37,517 - INFO - Best model saved with loss: 0.06948149565141648
+2025-06-03 18:51:37,557 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,557 - INFO - Epoch 16, Loss: 0.08587998896837234, Eval Loss: 0.07195198151748627
+2025-06-03 18:51:37,597 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,597 - INFO - Epoch 17, Loss: 0.09808039665222168, Eval Loss: 0.0670534404926002
+2025-06-03 18:51:37,598 - INFO - Best model saved with loss: 0.0670534404926002
+2025-06-03 18:51:37,658 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,658 - INFO - Epoch 18, Loss: 0.0418243370950222, Eval Loss: 0.06749912875238806
+2025-06-03 18:51:37,699 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,699 - INFO - Epoch 19, Loss: 0.06477586925029755, Eval Loss: 0.06330398912541568
+2025-06-03 18:51:37,699 - INFO - Best model saved with loss: 0.06330398912541568
+2025-06-03 18:51:37,739 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,740 - INFO - Epoch 20, Loss: 0.04830406606197357, Eval Loss: 0.061971275485120714
+2025-06-03 18:51:37,740 - INFO - Best model saved with loss: 0.061971275485120714
+2025-06-03 18:51:37,780 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,780 - INFO - Epoch 21, Loss: 0.05075730383396149, Eval Loss: 0.05833804269786924
+2025-06-03 18:51:37,780 - INFO - Best model saved with loss: 0.05833804269786924
+2025-06-03 18:51:37,821 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,821 - INFO - Epoch 22, Loss: 0.07971812039613724, Eval Loss: 0.05111234716605395
+2025-06-03 18:51:37,821 - INFO - Best model saved with loss: 0.05111234716605395
+2025-06-03 18:51:37,861 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,861 - INFO - Epoch 23, Loss: 0.019165057688951492, Eval Loss: 0.06231794657651335
+2025-06-03 18:51:37,902 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,902 - INFO - Epoch 24, Loss: 0.06437508016824722, Eval Loss: 0.05295514583121985
+2025-06-03 18:51:37,942 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,942 - INFO - Epoch 25, Loss: 0.06081223860383034, Eval Loss: 0.044659055420197546
+2025-06-03 18:51:37,942 - INFO - Best model saved with loss: 0.044659055420197546
+2025-06-03 18:51:37,982 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:37,983 - INFO - Epoch 26, Loss: 0.044270992279052734, Eval Loss: 0.04290398769080639
+2025-06-03 18:51:37,983 - INFO - Best model saved with loss: 0.04290398769080639
+2025-06-03 18:51:38,023 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,023 - INFO - Epoch 27, Loss: 0.05371939390897751, Eval Loss: 0.03855538432253525
+2025-06-03 18:51:38,024 - INFO - Best model saved with loss: 0.03855538432253525
+2025-06-03 18:51:38,064 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,064 - INFO - Epoch 28, Loss: 0.07312090694904327, Eval Loss: 0.03519720601616427
+2025-06-03 18:51:38,065 - INFO - Best model saved with loss: 0.03519720601616427
+2025-06-03 18:51:38,105 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,105 - INFO - Epoch 29, Loss: 0.03126214072108269, Eval Loss: 0.03176374878967181
+2025-06-03 18:51:38,105 - INFO - Best model saved with loss: 0.03176374878967181
+2025-06-03 18:51:38,146 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,146 - INFO - Epoch 30, Loss: 0.03905870392918587, Eval Loss: 0.028236449987161905
+2025-06-03 18:51:38,146 - INFO - Best model saved with loss: 0.028236449987161905
+2025-06-03 18:51:38,187 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,187 - INFO - Epoch 31, Loss: 0.016987284645438194, Eval Loss: 0.02731098438380286
+2025-06-03 18:51:38,187 - INFO - Best model saved with loss: 0.02731098438380286
+2025-06-03 18:51:38,227 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,227 - INFO - Epoch 32, Loss: 0.01833130232989788, Eval Loss: 0.02664795142482035
+2025-06-03 18:51:38,228 - INFO - Best model saved with loss: 0.02664795142482035
+2025-06-03 18:51:38,268 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,268 - INFO - Epoch 33, Loss: 0.03320055082440376, Eval Loss: 0.025232349493307993
+2025-06-03 18:51:38,268 - INFO - Best model saved with loss: 0.025232349493307993
+2025-06-03 18:51:38,309 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,309 - INFO - Epoch 34, Loss: 0.013161813840270042, Eval Loss: 0.023398603254463524
+2025-06-03 18:51:38,309 - INFO - Best model saved with loss: 0.023398603254463524
+2025-06-03 18:51:38,349 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,349 - INFO - Epoch 35, Loss: 0.020777661353349686, Eval Loss: 0.019580078136641532
+2025-06-03 18:51:38,350 - INFO - Best model saved with loss: 0.019580078136641532
+2025-06-03 18:51:38,390 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,390 - INFO - Epoch 36, Loss: 0.015523687936365604, Eval Loss: 0.01744520425563678
+2025-06-03 18:51:38,391 - INFO - Best model saved with loss: 0.01744520425563678
+2025-06-03 18:51:38,431 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,431 - INFO - Epoch 37, Loss: 0.011114257387816906, Eval Loss: 0.016232906375080347
+2025-06-03 18:51:38,431 - INFO - Best model saved with loss: 0.016232906375080347
+2025-06-03 18:51:38,471 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,471 - INFO - Epoch 38, Loss: 0.012127598747611046, Eval Loss: 0.018169976508943364
+2025-06-03 18:51:38,511 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,511 - INFO - Epoch 39, Loss: 0.01980549655854702, Eval Loss: 0.01306835982541088
+2025-06-03 18:51:38,512 - INFO - Best model saved with loss: 0.01306835982541088
+2025-06-03 18:51:38,553 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,554 - INFO - Epoch 40, Loss: 0.030087266117334366, Eval Loss: 0.012412367796059698
+2025-06-03 18:51:38,554 - INFO - Best model saved with loss: 0.012412367796059698
+2025-06-03 18:51:38,596 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,596 - INFO - Epoch 41, Loss: 0.015939421951770782, Eval Loss: 0.011346273560775444
+2025-06-03 18:51:38,596 - INFO - Best model saved with loss: 0.011346273560775444
+2025-06-03 18:51:38,637 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,637 - INFO - Epoch 42, Loss: 0.012430062517523766, Eval Loss: 0.010014266168582253
+2025-06-03 18:51:38,637 - INFO - Best model saved with loss: 0.010014266168582253
+2025-06-03 18:51:38,677 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,677 - INFO - Epoch 43, Loss: 0.004998891614377499, Eval Loss: 0.010997006524121389
+2025-06-03 18:51:38,718 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,718 - INFO - Epoch 44, Loss: 0.0038099074736237526, Eval Loss: 0.009169592980470043
+2025-06-03 18:51:38,719 - INFO - Best model saved with loss: 0.009169592980470043
+2025-06-03 18:51:38,759 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,759 - INFO - Epoch 45, Loss: 0.010860471986234188, Eval Loss: 0.01133984986518044
+2025-06-03 18:51:38,800 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,800 - INFO - Epoch 46, Loss: 0.016313700005412102, Eval Loss: 0.007029335996776354
+2025-06-03 18:51:38,800 - INFO - Best model saved with loss: 0.007029335996776354
+2025-06-03 18:51:38,840 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,840 - INFO - Epoch 47, Loss: 0.014703852124512196, Eval Loss: 0.007133285704185255
+2025-06-03 18:51:38,881 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,881 - INFO - Epoch 48, Loss: 0.010814975015819073, Eval Loss: 0.00989389800815843
+2025-06-03 18:51:38,921 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,921 - INFO - Epoch 49, Loss: 0.004817483481019735, Eval Loss: 0.005815104668727145
+2025-06-03 18:51:38,922 - INFO - Best model saved with loss: 0.005815104668727145
+2025-06-03 18:51:38,962 - INFO - Evaluation results saved to results/model1_eval/evaluation_results.csv
+2025-06-03 18:51:38,962 - INFO - Epoch 50, Loss: 0.0027006615418940783, Eval Loss: 0.00634715186606627
+2025-06-03 18:51:38,995 - INFO - Filtered data saved to data/processed/model1_output/predictions.csv

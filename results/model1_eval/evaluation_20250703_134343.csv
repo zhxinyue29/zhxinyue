@@ -1,0 +1,19 @@
+MAE,RMSE,Sharpe_Ratio,Max_Drawdown,num_samples,input_features,config_path,test_data_path,model_summary
+13851.411,53220.42,-26.32454,-0.0,15,"['Feature_0', 'Feature_1', 'Feature_2', 'Feature_3', 'Feature_4', 'Feature_5', 'Feature_6', 'Feature_7', 'Feature_8', 'Feature_9', 'Feature_10', 'Feature_11', 'Feature_12', 'Feature_13', 'Feature_14', 'Feature_15', 'Feature_16', 'Feature_17', 'Feature_18', 'Feature_19', 'Feature_20', 'Feature_21', 'Feature_22', 'Feature_23', 'Feature_24', 'Feature_25', 'Feature_26', 'Feature_27', 'Feature_28', 'Feature_29']",configs/model1.yaml,/home/liyakun/twitter-stock-prediction/data/splits/test/,"TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=1, bias=True)
+)"

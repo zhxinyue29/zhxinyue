@@ -1,0 +1,23 @@
+data:
+ train_file: 'data/processed/model2_input.csv'  # 训练数据文件路径
+ model1_path: 'models/model1/best_model.pt'     # 模型1的路径，用于加载进行推理
+
+training:
+ batch_size: 32         # 批量大小
+ epochs: 50             # 训练轮数
+ learning_rate: 0.001   # 学习率
+ loss_function: 'mse'   # 损失函数
+ # 其他监督学习相关参数...
+
+paths:
+ output_model: 'models/model2/best_model.pt'  # 保存模型2的路径
+ log_file: 'logs/model2_train.log'            # 日志文件路径
+
+env:
+ prediction_model_path: "/home/liyakun/twitter-stock-prediction/models/model2/best_model.pt"
+ # 添加Transformer参数
+ vocab_size: 32000
+ hidden_size: 30
+ num_layers: 6
+ num_heads: 6
+ input_dim: 773

@@ -1,0 +1,56 @@
+env:
+  prediction_model_path: '/home/liyakun/twitter-stock-prediction/models/model2/best_model.pt'  # 模型2的路径，用于加载进行推理
+  train_data_path: '/home/liyakun/twitter-stock-prediction/data/splits/train/'  # 股票数据路径
+  test_data_path: '/home/liyakun/twitter-stock-prediction/data/splits/test/' 
+  action_space_size: 773  # 动作空间大小
+  state_space_size: 773  # 状态空间大小
+  initial_balance: 10000  # 初始资金
+  transaction_fee: 0.001
+  max_holding_days: 30
+  reward_type: 'sparse'
+  hidden_size: 30
+  num_layers: 6
+  num_heads: 6
+  
+  # 其他环境设置...
+
+training:
+  algorithm: 'PPO'  # 使用的强化学习算法
+  total_timesteps: 10000  # 训练总步数
+  learning_rate: 1e-5  # 学习率
+  gamma: 0.99  # 折扣因子
+  batch_size: 16
+  epochs: 50
+  
+  # 其他强化学习相关参数...
+
+paths:
+  output_model: 'models/model1/best_model.pt'  # 保存模型1的路径
+  log_file: 'logs/model1_train.log'  # 日志文件路径
+  eval_output_path: 'results/model1_eval/evaluation_results.csv'
+
+predict:
+  steps: 1000  # 预测步数
+  output_path: 'data/processed/model1_output/predictions.csv'  # 预测结果保存路径
+
+model:
+  name: 'transformer'
+  params:
+    vocab_size: 151936  # 词汇表大小
+    hidden_size: 1024   # 隐藏层维度
+    num_layers: 16     # Transformer层数
+    action_space_size: 773
+    num_attention_heads: 8
+    intermediate_size: 5012
+    input_dim: 773
+
+stability:
+  max_nan_allowed: 0       # 输入中允许的最大NaN值数量(0表示不允许任何NaN)
+  output_clip_range: [-5.0, 5.0]   # 模型输出剪裁范围
+  max_grad_norm: 1.0       # 梯度剪裁阈值
+  gradient_clip_value: 100.0   # 最大梯度值(防止爆炸)
+  add_output_noise: true   # 是否在输出添加噪声
+  noise_std: 0.01          # 输出噪声标准差
+  backup_interval: 5       # 每5个epoch创建一个安全恢复点
+  recovery_strategy: backoff # 恢复策略(backoff/reset)
+  lr_backoff_factor: 0.5   # 学习率退避系数

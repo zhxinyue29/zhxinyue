@@ -1,0 +1,6 @@
+data/
+data_preprocessing/
+.vscode/
+models/
+best_model.pt
+**/**.pt
