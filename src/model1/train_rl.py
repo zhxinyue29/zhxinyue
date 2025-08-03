@@ -20,6 +20,20 @@ from contextlib import contextmanager
 import inspect
 import warnings
 from ..model2.inference import load_model, predict, DeepSeekModel
+# 事件类型定义
+EVENT_DEFAULT = 0          # 普通市场事件
+EVENT_EARNINGS = 1         # 财报事件
+EVENT_GOVERNANCE = 2       # 公司治理事件（如董事变更）
+EVENT_MERGER = 3           # 并购事件
+# 可以根据需要添加更多事件类型
+
+# 动作类型定义
+ACTION_BUY = 0             # 做多
+ACTION_HOLD = 1            # 持有/空仓
+ACTION_SELL_SHORT = 2      # 做空
+# 对于特殊事件，可以定义额外动作
+ACTION_AVOID = 3           # 完全避免
+ACTION_REDUCE = 4          # 减少敞口
 
 
 config_path = '/home/liyakun/twitter-stock-prediction/configs/model1.yaml'
@@ -419,59 +433,197 @@ class GradientMonitor:
         elif batch_idx % 10 == 0:
             self.logger.info(report)
 
-
+# 在您的模型定义中添加事件分类头
+class EnhancedModel(nn.Module):
+    def __init__(self, input_dim, num_actions, num_event_classes):
+        super().__init__()
+        # 共享的特征提取层
+        self.feature_extractor = nn.Sequential(
+            nn.Linear(input_dim, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 128),
+            nn.ReLU()
+        )
+        
+        # 原有的两个输出头
+        self.policy_head = nn.Linear(128, num_actions)  # 策略输出头
+        self.value_head = nn.Linear(128, 1)             # 原有的监督回归头
+        
+        # 新添加的事件分类头
+        self.event_head = nn.Linear(128, num_event_classes)  # 事件分类头
+        
+        # 可选：针对特殊事件添加专业处理分支
+        # 例如针对公司治理事件
+        self.governance_head = None
+        if num_event_classes > 3:  # 如果有特殊事件类型
+            self.governance_head = nn.Sequential(
+                nn.Linear(128, 64),
+                nn.ReLU(),
+                nn.Linear(64, 3)  # 输出治理事件的特殊动作
+            )
+    
+    def forward(self, x):
+        features = self.feature_extractor(x)
+        
+        # 原有输出
+        policy_outputs = self.policy_head(features)
+        value_outputs = self.value_head(features)
+        
+        # 新增的事件分类输出
+        event_logits = self.event_head(features)
+        
+        # 特殊事件处理
+        governance_outputs = None
+        if self.governance_head is not None:
+            governance_outputs = self.governance_head(features)
+        
+        return {
+            "policy": policy_outputs,
+            "value": value_outputs,
+            "event": event_logits,
+            "special_actions": governance_outputs
+        }
 # === 新增: SmoothL1损失函数 ===
 
 class RLoss(nn.Module):
-    def __init__(self, supervised_criterion, base_loss_weight=0.5):
+    def __init__(self, supervised_criterion, num_event_classes, base_loss_weight=0.5):
         super().__init__()
         self.base_loss_weight = base_loss_weight
-        self.supervised_criterion = supervised_criterion  # SafeSmoothL1Loss
+        self.supervised_criterion = supervised_criterion
+        self.num_event_classes = num_event_classes
+        
+        # 事件权重 - 根据重要性设置
+        self.event_weights = torch.ones(num_event_classes)
+        # 例如：公司治理事件权重更高
+        if num_event_classes > 0:  # 确保有公司治理事件
+            self.event_weights[EVENT_GOVERNANCE] = 2.0  # 公司治理事件更重要
     
-    def forward(self, policy_outputs, model2_outputs, targets, reward):
-        # 监督损失部分 - 保持基础预测能力
-        supervised_loss = self.supervised_criterion(model2_outputs.squeeze(), targets)
-         # 2. 专业的策略梯度损失 - 将奖励与动作概率关联
-        # 将策略输出转换为概率分布
-        action_probs = F.softmax(policy_outputs, dim=1)
-        # 金融策略梯度损失 (方向性加权)
-        position_direction = torch.argmax(action_probs, dim=1)  # 0: 做多, 1: 空仓, 2: 做空
-        market_direction = (targets > 0).long()  # 市场方向 1: 上涨, 0: 下跌
-        valid_actions = market_direction.clone()
-        valid_actions[market_direction == 0] = 2  # 下跌时希望模型选做空
-        valid_actions[market_direction == 1] = 0  # 上涨时希望模型选做多
+    def forward(self, model_outputs, targets, reward, event_targets):
+        # 1. 基础监督损失 - 保持价格预测能力
+        supervised_loss = self.supervised_criterion(model_outputs["value"].squeeze(), targets)
         
-        # 方向匹配度 (用于策略梯度加权)
-        directional_match = (position_direction == valid_actions).float()
+        # 2. 事件分类损失 - 确保准确识别事件类型
+        event_loss = F.cross_entropy(model_outputs["event"], event_targets, weight=self.event_weights)
         
-        # 计算对数概率 (用于策略梯度)
-        chosen_action_probs = torch.gather(action_probs, 1, position_direction.unsqueeze(1)).squeeze()
-        log_probs = torch.log(chosen_action_probs + 1e-8)
+        # 3. 分情况处理的策略损失
+        policy_loss, match_rate = self.calculate_policy_loss(
+            model_outputs, 
+            targets,
+            reward,
+            event_targets
+        )
         
-        # 金融特化的策略梯度损失
-        rl_loss = -torch.mean(log_probs * reward * (1.0 + 0.5 * directional_match))
-        
-        # 3. 动态调整权重 (基于市场波动率)
+        # 4. 动态调整权重
         volatility = torch.abs(targets).mean()
         current_weight = self.dynamic_weight_adjust(volatility)
         
-        # 4. 混合损失
-        total_loss = current_weight * supervised_loss + (1 - current_weight) * rl_loss
+        # 5. 混合损失 - 综合所有成分
+        total_loss = (
+            current_weight * supervised_loss +
+            (1 - current_weight) * 0.3 * event_loss + 
+            (1 - current_weight) * 0.7 * policy_loss
+        )
         
         # 返回损失和相关指标
         return {
             "total_loss": total_loss,
             "supervised_loss": supervised_loss,
-            "rl_loss": rl_loss,
+            "event_loss": event_loss,
+            "policy_loss": policy_loss,
             "weight": current_weight,
             "mean_reward": reward.mean(),
-            "match_rate": directional_match.mean()
+            "match_rate": match_rate
         }
+    
+    def calculate_policy_loss(self, model_outputs, targets, reward, event_targets):
+        # 将策略输出转换为概率分布
+        action_probs = F.softmax(model_outputs["policy"], dim=1)
+        position_direction = torch.argmax(action_probs, dim=1)
+        
+        # 基础策略逻辑（适用于普通事件）
+        market_direction = (targets > 0).long()
+        valid_actions = market_direction.clone()
+        valid_actions[market_direction == 0] = 2  # 下跌时希望模型选做空
+        valid_actions[market_direction == 1] = 0  # 上涨时希望模型选做多
+        
+        # 创建事件标签掩码
+        event_mask = (event_targets == EVENT_GOVERNANCE)
+        
+        # 对于普通事件，使用基础策略
+        if torch.any(~event_mask):
+            normal_directional_match = (position_direction[~event_mask] == valid_actions[~event_mask]).float()
+            normal_chosen_probs = torch.gather(action_probs[~event_mask], 1, position_direction[~event_mask].unsqueeze(1)).squeeze()
+            normal_log_probs = torch.log(normal_chosen_probs + 1e-8)
+            normal_rl_loss = -torch.mean(normal_log_probs * reward[~event_mask] * (1.0 + 0.5 * normal_directional_match))
+        else:
+            normal_rl_loss = torch.tensor(0.0).to(reward.device)
+        
+        # 对于特殊事件（公司治理事件），使用不同的规则
+        if torch.any(event_mask):
+            governance_rl_loss, governance_match = self.handle_special_event(
+                model_outputs, 
+                event_targets, 
+                targets[event_mask], 
+                reward[event_mask]
+            )
+        else:
+            governance_rl_loss = torch.tensor(0.0).to(reward.device)
+            governance_match = torch.tensor(0.0).to(reward.device)
+        
+        # 计算总体匹配率
+        if torch.any(event_mask):
+            overall_match = (normal_directional_match.mean() * (~event_mask).sum() + 
+                            governance_match * event_mask.sum()) / len(event_targets)
+        else:
+            overall_match = normal_directional_match.mean()
+        
+        # 组合策略损失
+        policy_loss = normal_rl_loss + governance_rl_loss
+        
+        return policy_loss, overall_match
+    
+    def handle_special_event(self, model_outputs, event_targets, targets, reward):
+        """处理公司治理事件（如董事去世）的特殊规则"""
+        # 1. 提取特殊事件的数据
+        special_mask = (event_targets == EVENT_GOVERNANCE)
+        
+        # 2. 获取公司治理的特定动作建议
+        if model_outputs["special_actions"] is not None:
+            # 使用特殊处理分支的输出
+            special_action_probs = F.softmax(model_outputs["special_actions"][special_mask], dim=1)
+            special_position = torch.argmax(special_action_probs, dim=1)
+        else:
+            # 如果没有特殊分支，使用常规策略输出
+            special_action_probs = F.softmax(model_outputs["policy"][special_mask], dim=1)
+            special_position = torch.argmax(special_action_probs, dim=1)
+        
+        # 3. 公司治理事件的不同规则
+        # 对于负面治理事件（如董事去世），更保守的处理
+        valid_actions = torch.ones_like(special_position) * ACTION_HOLD  # 建议持有（观望）
+        
+        # 如果有严重治理风险，建议减持
+        severe_risk_mask = (targets < -0.05)  # 预计负面影响超过5%
+        valid_actions[severe_risk_mask] = ACTION_SELL_SHORT
+        
+        # 计算匹配率
+        directional_match = (special_position == valid_actions).float().mean()
+        
+        # 计算对数概率
+        chosen_probs = torch.gather(special_action_probs, 1, special_position.unsqueeze(1)).squeeze()
+        log_probs = torch.log(chosen_probs + 1e-8)
+        
+        # 调整奖励 - 治理事件的风险更高
+        adjusted_reward = reward * 1.3  # 放大奖励信号
+        
+        # 策略损失
+        rl_loss = -torch.mean(log_probs * adjusted_reward * (1.0 + 0.2 * directional_match))
+        
+        return rl_loss, directional_match
     
     def dynamic_weight_adjust(self, volatility):
         """根据市场波动率调整监督损失权重"""
-        # 波动率较高时降低监督权重 (0.2-0.8范围)
-        return torch.clamp(0.7 - volatility * 20, min=0.2, max=0.8).item()
+        return torch.clamp(0.65 - volatility * 25, min=0.2, max=0.7).item()
 
 def get_rl_weight(epoch):
     """根据训练进度返回监督损失权重"""
@@ -877,14 +1029,24 @@ def main(config_path: str):
     safety = SafetyController(model, optimizer, config, logger)
     
     # 创建梯度监控器
+    model = EnhancedModel(
+    input_dim=config['model']['input_dim'],
+    num_actions=3,  # 做多/持有/做空
+    num_event_classes=4  # 您定义的事件类型数量
+).to(device)
+
+# 使用新损失函数
+    loss_fn = RLoss(
+    supervised_criterion = SafeSmoothL1Loss(beta=1.0).to(device),  # 或您原有的监督损失
+    num_event_classes=4,
+    base_loss_weight=config['training']['base_loss_weight']
+).to(device)
     grad_monitor = GradientMonitor(model)
     grad_monitor.attach()
     torch.autograd.set_detect_anomaly(True)
-    supervised_criterion = SafeSmoothL1Loss(beta=1.0).to(device)
-    rl_criterion = RLoss(supervised_criterion, base_loss_weight=0.5).to(device)  
     for epoch in range(config['training']['epochs']):
         new_weight = get_rl_weight(epoch)
-        rl_criterion.update_weight(new_weight)
+        loss_fn.base_loss_weight = new_weight  # 动态调整权重
         safety.create_backup(epoch)
         model.train()
         epoch_loss = 0.0
@@ -894,9 +1056,10 @@ def main(config_path: str):
         print(f"\n【调试】开始第 {epoch+1} 轮训练")
         for batch_idx,batch_data in enumerate(train_loader):
             print(f"\n【调试】第 {batch_idx+1} 批次")
-            # print("batch_data 内容：", batch_data)
+            # print("batch_data 内容：", batch_data)123456
+            
 
-            inputs, targets, dates = batch_data
+            inputs, targets, dates,rewards, event_labels, = batch_data
             print("原始inputs.shape:", inputs.shape)
             print("原始targets.shape:", targets.shape)
             print("inputs设备:", inputs.device)
@@ -904,15 +1067,15 @@ def main(config_path: str):
             # 转移到设备
             inputs = inputs.to(device)
             targets = targets.to(device)
+            rewards = rewards.to(device)
+            event_labels = event_labels.to(device)
                         
            
             # 1. 输入数据检查
             if not safety.check_inputs(inputs, targets):
                 nan_batch_count += 1
                 continue
-                
-            
-            
+                           
             # 2. 在安全上下文中执行前向传播
             loss = None
             with safety.safe_forward_context():
@@ -921,6 +1084,8 @@ def main(config_path: str):
                 print(outputs)
                 print("outputs的形状：", outputs.shape)
                 print(torch.min(outputs).item(), torch.max(outputs).item())
+                representation = model.get_features(inputs)
+                protected_rep = safety.protect_outputs(representation)
                 
                 if outputs is None:
                     print("模型输出为None，跳过保护和loss计算")
@@ -931,22 +1096,34 @@ def main(config_path: str):
                 model2_result = predict(model2, outputs)
                 print("模型二推理结果：", model2_result)
                 # 计算奖励（示例）
-                direction_match = (torch.sign(model2_result[:,0]) == torch.sign(targets)).float()
+                direction_match = (torch.sign(model2_result) == torch.sign(targets)).float()
+                magnitude_error = torch.abs(model2_result - targets)
                 accuracy_reward = direction_match * 0.8
-                error_reward = torch.exp(-2 * torch.abs(model2_result[:,0] - targets)) * 0.2
+                
+                # 幅度误差奖励（误差越小奖励越高）
+                error_reward = torch.exp(-2 * magnitude_error) * 0.2
                 reward = (accuracy_reward + error_reward).detach()
-                print("模型输出（调试）：", outputs)
-                print(f"平均奖励: {reward.mean().item():.4f}")
-                outputs_protected = safety.protect_outputs(outputs)
-
-                if outputs_protected is None:
-                    print("保护后输出为None，跳过loss计算")
-                    continue
-
-                # 以保护后输出进行loss
-                loss = rl_criterion(outputs_protected, model2_result, targets, reward)
-                batch_reward = reward.mean().item()
-                print("当前loss:", loss.item())
+                print(f"平均方向匹配率: {direction_match.mean().item():.4f}")
+                print(f"平均误差奖励: {error_reward.mean().item():.4f}")
+                print(f"最终平均奖励: {reward.mean().item():.4f}")
+                protected_outputs = {}
+                for key, value in outputs.items():
+                    protected_outputs[key] = safety.protect_outputs(value)
+                    print(f"{key}头保护后: min={protected_outputs[key].min().item():.4f}, max={protected_outputs[key].max().item():.4f}")
+                
+            # 6. 使用损失函数（保持原接口不变）
+                loss_dict = loss_fn(
+                    model_outputs=protected_outputs,
+                    targets=targets,
+                    reward=reward,
+                    event_targets=event_labels
+                )
+                
+                loss = loss_dict["total_loss"]
+                print(f"总损失: {loss.item():.4f} | "
+                    f"监督损失: {loss_dict['supervised_loss'].item():.4f} | "
+                    f"策略损失: {loss_dict['policy_loss'].item():.4f} | "
+                    f"事件损失: {loss_dict['event_loss'].item():.4f}")
                 
             
             # 反向传播
