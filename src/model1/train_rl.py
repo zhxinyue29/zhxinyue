@@ -435,7 +435,7 @@ class GradientMonitor:
 
 # 在您的模型定义中添加事件分类头
 class EnhancedModel(nn.Module):
-    def __init__(self, input_dim, num_actions, num_event_classes):
+    def __init__(self, input_dim, num_actions, num_event_classes,special_head=None,special_event_id=None):
         super().__init__()
         # 共享的特征提取层
         self.feature_extractor = nn.Sequential(
@@ -452,42 +452,60 @@ class EnhancedModel(nn.Module):
         
         # 新添加的事件分类头
         self.event_head = nn.Linear(128, num_event_classes)  # 事件分类头
-        
-        # 可选：针对特殊事件添加专业处理分支
-        # 例如针对公司治理事件
-        self.governance_head = None
-        if num_event_classes > 3:  # 如果有特殊事件类型
-            self.governance_head = nn.Sequential(
+        if special_event_id is not None:
+            self.special_head = nn.Sequential(
                 nn.Linear(128, 64),
                 nn.ReLU(),
                 nn.Linear(64, 3)  # 输出治理事件的特殊动作
             )
+        else:
+            self.special_head = None
     
     def forward(self, x):
         features = self.feature_extractor(x)
         
-        # 原有输出
-        policy_outputs = self.policy_head(features)
-        value_outputs = self.value_head(features)
-        
-        # 新增的事件分类输出
+        # 事件分类
         event_logits = self.event_head(features)
+        event_probs = F.softmax(event_logits, dim=-1)
+        
+        # 主策略输出
+        base_policy = self.policy_head(features)
         
         # 特殊事件处理
-        governance_outputs = None
-        if self.governance_head is not None:
-            governance_outputs = self.governance_head(features)
+        if (hasattr(self, 'special_head') and self.special_head is not None and
+            hasattr(self, 'special_event_id') and self.special_event_id is not None):
+            special_actions = self.special_head(features)
+            
+            # 创建特殊事件掩码
+            is_special_event = (event_probs.argmax(-1) == self.special_event_id)
+            
+            # 合并策略输出
+            policy_output = torch.where(
+                is_special_event.unsqueeze(1), 
+                special_actions, 
+                base_policy
+            )
+        else:
+            policy_output = base_policy
+            special_actions = None
         
         return {
-            "policy": policy_outputs,
-            "value": value_outputs,
+            "policy": policy_output,
+            "value": self.value_head(features),
             "event": event_logits,
-            "special_actions": governance_outputs
+            "special_actions": special_actions
         }
+    
+    def predict_special_event_proba(self, x):
+        """仅用于预测特殊事件概率"""
+        features = self.feature_extractor(x)
+        event_logits = self.event_head(features)
+        event_probs = F.softmax(event_logits, dim=-1)
+        return event_probs[:, self.special_event_id]
 # === 新增: SmoothL1损失函数 ===
 
 class RLoss(nn.Module):
-    def __init__(self, supervised_criterion, num_event_classes, base_loss_weight=0.5):
+    def __init__(self, supervised_criterion, num_event_classes, base_loss_weight=0.5, special_event_id=3):
         super().__init__()
         self.base_loss_weight = base_loss_weight
         self.supervised_criterion = supervised_criterion
@@ -502,7 +520,7 @@ class RLoss(nn.Module):
     def forward(self, model_outputs, targets, reward, event_targets):
         # 1. 基础监督损失 - 保持价格预测能力
         supervised_loss = self.supervised_criterion(model_outputs["value"].squeeze(), targets)
-        
+
         # 2. 事件分类损失 - 确保准确识别事件类型
         event_loss = F.cross_entropy(model_outputs["event"], event_targets, weight=self.event_weights)
         
@@ -548,7 +566,7 @@ class RLoss(nn.Module):
         valid_actions[market_direction == 1] = 0  # 上涨时希望模型选做多
         
         # 创建事件标签掩码
-        event_mask = (event_targets == EVENT_GOVERNANCE)
+        event_mask = (event_targets == self.special_event_id)
         
         # 对于普通事件，使用基础策略
         if torch.any(~event_mask):
@@ -586,8 +604,18 @@ class RLoss(nn.Module):
     def handle_special_event(self, model_outputs, event_targets, targets, reward):
         """处理公司治理事件（如董事去世）的特殊规则"""
         # 1. 提取特殊事件的数据
-        special_mask = (event_targets == EVENT_GOVERNANCE)
+        special_mask = (event_targets == self.special_event_id)
+        # 判断特殊动作分支是否可用
+        has_special_head = ("special_actions" in model_outputs and 
+                        model_outputs["special_actions"] is not None)
         
+        # 优先使用特殊动作分支（如果可用）
+        if has_special_head:
+            # 使用特殊处理分支的输出
+            special_action_probs = F.softmax(model_outputs["special_actions"][special_mask], dim=1)
+        else:
+            # 回退到常规策略输出
+            special_action_probs = F.softmax(model_outputs["policy"][special_mask], dim=1)
         # 2. 获取公司治理的特定动作建议
         if model_outputs["special_actions"] is not None:
             # 使用特殊处理分支的输出
@@ -670,61 +698,72 @@ class SafeSmoothL1Loss(nn.Module):
         return loss
 
 class NPYDataset(Dataset):
-    def __init__(self, x_file: str, y_file: str,dates_file: str,filter_nan=True,feature_names=None):
+    def __init__(self, x_file: str, y_file: str, dates_file: str, 
+                 events_file: str = None,  # 新增事件标签文件
+                 event_map: dict = None,    # 事件名称到ID的映射
+                 filter_nan=True, 
+                 feature_names=None):
         print("Loading data files:")
         print("x_file:", x_file)
         print("y_file:", y_file)
         print("dates_file:", dates_file)
-        self.x_data = np.load(x_file)
-        self.y_data = np.load(y_file)
-        self.dates = np.load(dates_file)  # [N]
+        print("events_file:", events_file)
+        
         try:
+            # 加载基本数据
             self.x_data = np.load(x_file)
             self.y_data = np.load(y_file)
             self.dates = np.load(dates_file) if dates_file else None
+            
+            # 设置事件映射(关键修复)
+            # 提供默认事件映射
+            self.event_map = event_map or {
+                "普通事件": 0,
+                "金融事件": 1,
+                "政策变化": 2,
+                "公司治理": 3
+            }
+            
+            # 加载事件数据（如果有）
+            self.raw_events = None
+            if events_file:
+                self.raw_events = np.load(events_file)
+                print(f"Loaded events from {events_file}, shape: {self.raw_events.shape}")
+            
+            # 创建反向映射
+            self.id_to_event = {v: k for k, v in self.event_map.items()}
+            
         except Exception as e:
             print("加载npz文件时出错:", e)
             raise
+            
+        # 打印形状信息
         print("x_data.shape:", self.x_data.shape)
         print("y_data.shape:", self.y_data.shape)
         if self.dates is not None:
             print("dates.shape:", self.dates.shape)
+        if self.raw_events is not None:
+            print("raw_events.shape:", self.raw_events.shape)
+            
+        # 验证数据一致性
         assert len(self.x_data) == len(self.y_data), "x和y行数不一致"
         if self.dates is not None:
             assert len(self.x_data) == len(self.dates), "x和dates行数不一致"
-        assert len(self.x_data) == len(self.y_data) == len(self.dates), "x, y, dates行数不一致"
+        if self.raw_events is not None:
+            assert len(self.x_data) == len(self.raw_events), "x和events行数不一致"
+            
         if filter_nan:
             self._filter_nan_samples()
+            
         self.feature_names = feature_names
-    
-        # 如果没有传入，则可以尝试自动定义（比如：假设是所有特征名）
         if self.feature_names is None:
-            # 这里可以自定义默认特征名
             self.feature_names = [f'Feature_{i}' for i in range(self.x_data.shape[1])]
-    
-    def __len__(self):
-        return len(self.x_data)
-    
-    def __getitem__(self, idx):
-        data = self.x_data[idx]
-        label = self.y_data[idx]
-        date = self.dates[idx]
-        # 额外检查
-        data = torch.tensor(data, dtype=torch.float32) 
-        label = torch.tensor(label, dtype=torch.float32)
-        if torch.isnan(data).any():
-            # 处理NaN，比如用0替代
-            data = torch.nan_to_num(data, nan=0.0)
-        if torch.isinf(data).any():
-            data = torch.nan_to_num(data, posinf=1e6, neginf=-1e6)
-            print("inputs:",data.shape)
-        return data, label, date
     
     def _filter_nan_samples(self):
         """过滤包含NaN的样本"""
         original_count = len(self.x_data)
         
-        # 找到有效索引
+        # 仅根据x和y过滤NaN
         valid_indices = [
             i for i in range(original_count)
             if not np.isnan(self.x_data[i]).any() and not np.isnan(self.y_data[i]).any()
@@ -734,9 +773,61 @@ class NPYDataset(Dataset):
         self.x_data = self.x_data[valid_indices]
         self.y_data = self.y_data[valid_indices]
         self.dates = self.dates[valid_indices] if self.dates is not None else None
+        if self.raw_events is not None:
+            self.raw_events = self.raw_events[valid_indices]
         
         filtered_count = original_count - len(valid_indices)
         print(f"过滤掉包含NaN的样本: {filtered_count}/{original_count}")
+    
+    def __len__(self):
+        return len(self.x_data)
+    
+    def __getitem__(self, idx):
+        data = self.x_data[idx]
+        label = self.y_data[idx]
+        date = self.dates[idx]
+        
+        # 处理事件标签（修正的命名）
+        event_id = 0  # 默认普通事件
+        if self.raw_events is not None:
+            event_label = self.raw_events[idx]
+            
+            # 事件标签格式转换
+            if isinstance(event_label, str):
+                # 确保事件映射存在
+                if self.event_map is None:
+                    raise RuntimeError("事件映射未定义，无法转换字符串事件标签")
+                
+                event_id = self.event_map.get(event_label, 0)  # 默认普通事件
+            elif event_label is not None:
+                # 数值类型直接转换
+                event_id = int(event_label)
+        
+        # 转换为Tensor
+        data = torch.tensor(data, dtype=torch.float32) 
+        label = torch.tensor(label, dtype=torch.float32)
+        event_id = torch.tensor(event_id, dtype=torch.long)  # 事件ID
+        
+        # 数据清洗
+        if torch.isnan(data).any():
+            data = torch.nan_to_num(data, nan=0.0)
+        if torch.isinf(data).any():
+            data = torch.nan_to_num(data, posinf=1e6, neginf=-1e6)
+        
+        # 返回包含事件标签的四元组
+        return data, label, date, event_id
+    
+    def get_event_names(self):
+        """获取所有事件名称列表"""
+        if self.event_map is None:
+            return []
+        return list(self.event_map.keys())
+    
+    def get_special_event_id(self):
+        """获取特殊事件ID"""
+        if self.event_map is None:
+            return 3  # 默认值
+        return self.event_map.get("公司治理", 3)
 
 class TransformerModel(nn.Module):
     """Transformer模型定义，匹配预训练权重结构"""
@@ -987,7 +1078,13 @@ def main(config_path: str):
     
     # 训练数据集
     logger.info(f"📦 加载训练数据: {train_dir}")
-    train_dataset = NPYDataset(x_path,y_path,dates_path)
+    event_mapping = {
+    "普通事件": 0,
+    "金融事件": 1,
+    "政策变化": 2,
+    "公司治理": 3
+}
+    train_dataset = NPYDataset(x_path,y_path,dates_path,events_file="events.npy",event_map=event_mapping)
     train_loader = DataLoader(
         train_dataset, 
         batch_size=config['training']['batch_size'], 
@@ -1030,16 +1127,18 @@ def main(config_path: str):
     
     # 创建梯度监控器
     model = EnhancedModel(
-    input_dim=config['model']['input_dim'],
+    input_dim=config['model']['params']['input_dim'],
     num_actions=3,  # 做多/持有/做空
-    num_event_classes=4  # 您定义的事件类型数量
+    num_event_classes=4,  # 您定义的事件类型数量
+    special_event_id=config['model']['params']['special_event_id'] 
 ).to(device)
 
 # 使用新损失函数
     loss_fn = RLoss(
-    supervised_criterion = SafeSmoothL1Loss(beta=1.0).to(device),  # 或您原有的监督损失
+    supervised_criterion=SafeSmoothL1Loss(beta=1.0).to(device),
     num_event_classes=4,
-    base_loss_weight=config['training']['base_loss_weight']
+    base_loss_weight=config['training']['base_loss_weight'],
+    special_event_id=config['model']['params']['special_event_id']   # 添加这行
 ).to(device)
     grad_monitor = GradientMonitor(model)
     grad_monitor.attach()
@@ -1057,19 +1156,14 @@ def main(config_path: str):
         for batch_idx,batch_data in enumerate(train_loader):
             print(f"\n【调试】第 {batch_idx+1} 批次")
             # print("batch_data 内容：", batch_data)123456
-            
-
-            inputs, targets, dates,rewards, event_labels, = batch_data
+            inputs, targets, dates, event_labels= batch_data
             print("原始inputs.shape:", inputs.shape)
             print("原始targets.shape:", targets.shape)
             print("inputs设备:", inputs.device)
             print("targets设备:", targets.device)
             # 转移到设备
             inputs = inputs.to(device)
-            targets = targets.to(device)
-            rewards = rewards.to(device)
-            event_labels = event_labels.to(device)
-                        
+            targets = targets.to(device)      
            
             # 1. 输入数据检查
             if not safety.check_inputs(inputs, targets):
@@ -1116,7 +1210,7 @@ def main(config_path: str):
                     model_outputs=protected_outputs,
                     targets=targets,
                     reward=reward,
-                    event_targets=event_labels
+                    event_targets=event_labels,
                 )
                 
                 loss = loss_dict["total_loss"]

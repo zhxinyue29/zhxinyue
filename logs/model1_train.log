@@ -7019,3 +7019,265 @@
 2025-08-02 17:41:04,967 - training - INFO - ⚙️ 模型运行在: cuda
 2025-08-02 17:41:04,982 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
 2025-08-02 17:41:05,636 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 11:58:13,490 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 11:58:13,522 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 11:58:13,522 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 11:58:14,812 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 11:58:48,257 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 11:58:48,580 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 11:58:49,556 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 11:58:49,566 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 11:58:55,356 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 12:33:28,045 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 12:33:28,045 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 12:33:28,045 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 12:33:29,176 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 12:33:32,010 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 12:33:32,334 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 12:33:32,592 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 12:33:32,604 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 12:33:33,217 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 12:34:32,133 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 12:34:32,133 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 12:34:32,134 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 12:34:33,281 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 12:34:36,116 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 12:34:36,438 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 12:34:36,697 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 12:34:36,709 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 12:34:37,325 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 12:35:09,103 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 12:35:09,103 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 12:35:09,103 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 12:35:10,243 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 12:35:13,103 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 12:35:13,425 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 12:35:13,682 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 12:35:13,693 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 12:35:14,302 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 12:38:36,096 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 12:38:36,097 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 12:38:36,097 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 12:38:37,234 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 12:38:40,062 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 12:38:40,384 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 12:38:40,657 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 12:38:40,673 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 12:38:41,312 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 12:39:49,591 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 12:39:49,592 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 12:39:49,592 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 12:39:50,733 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 12:39:53,613 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 12:39:53,935 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 12:39:54,191 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 12:39:54,202 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 12:39:54,824 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 12:42:14,047 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 12:42:14,048 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 12:42:14,048 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 12:42:15,187 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 12:42:18,054 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 12:42:18,376 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 12:42:18,640 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 12:42:18,651 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 12:42:19,269 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 13:01:48,204 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 13:01:48,204 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 13:01:48,204 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 13:01:49,344 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 13:01:52,264 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 13:01:52,585 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 13:01:52,843 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 13:01:52,854 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 13:01:53,465 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-04 13:10:12,460 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 13:10:12,460 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 13:10:12,460 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 13:17:08,449 - training - INFO - 🚀 开始运行训练脚本
+2025-08-04 13:17:08,449 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-04 13:17:08,449 - training - INFO - 📁 所有输出目录已创建
+2025-08-04 13:17:09,590 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-04 13:17:12,554 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-04 13:17:12,876 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-04 13:17:13,134 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-04 13:17:13,146 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/
+2025-08-04 13:17:13,765 - training - INFO - ℹ️ 使用SmoothL1Loss作为损失函数，对异常值更鲁棒
+2025-08-05 12:17:06,285 - training - INFO - 🚀 开始运行训练脚本
+2025-08-05 12:17:06,316 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-08-05 12:17:06,316 - training - INFO - 📁 所有输出目录已创建
+2025-08-05 12:17:07,593 - training - INFO - ⚙️ 加载预训练模型: models/model1/best_model.pt
+2025-08-05 12:17:41,016 - training - INFO - ✅ 成功加载预训练模型权重
+2025-08-05 12:17:41,337 - training - INFO - 🔄 模型初始化完成, 结构: TransformerModel(
+  (input_fc): Linear(in_features=773, out_features=1024, bias=True)
+  (layers): ModuleList(
+    (0-15): 16 x TransformerEncoderLayer(
+      (self_attn): MultiheadAttention(
+        (out_proj): NonDynamicallyQuantizableLinear(in_features=1024, out_features=1024, bias=True)
+      )
+      (linear1): Linear(in_features=1024, out_features=5012, bias=True)
+      (dropout): Dropout(p=0.1, inplace=False)
+      (linear2): Linear(in_features=5012, out_features=1024, bias=True)
+      (norm1): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (norm2): LayerNorm((1024,), eps=1e-05, elementwise_affine=True)
+      (dropout1): Dropout(p=0.1, inplace=False)
+      (dropout2): Dropout(p=0.1, inplace=False)
+    )
+  )
+  (out_proj): Linear(in_features=1024, out_features=773, bias=True)
+)
+2025-08-05 12:17:42,343 - training - INFO - ⚙️ 模型运行在: cuda
+2025-08-05 12:17:42,358 - training - INFO - 📦 加载训练数据: /home/liyakun/twitter-stock-prediction/data/splits/train/

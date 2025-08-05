@@ -21,6 +21,8 @@ training:
   gamma: 0.99  # 折扣因子
   batch_size: 16
   epochs: 50
+  special_event_id: 3
+  base_loss_weight: 0.6
   
   # 其他强化学习相关参数...
 
@@ -43,6 +45,7 @@ model:
     num_attention_heads: 8
     intermediate_size: 5012
     input_dim: 773
+    special_event_id: 3
 
 stability:
   max_nan_allowed: 0       # 输入中允许的最大NaN值数量(0表示不允许任何NaN)

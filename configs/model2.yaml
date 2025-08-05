@@ -7,6 +7,7 @@ training:
  epochs: 50             # 训练轮数
  learning_rate: 0.001   # 学习率
  loss_function: 'mse'   # 损失函数
+ special_event_id: 3
  # 其他监督学习相关参数...
 
 paths:
