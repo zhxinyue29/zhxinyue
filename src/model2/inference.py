@@ -84,6 +84,7 @@ class DeepSeekModel(nn.Module):
         # 根据任务需要，可能加池化或特定位置输出
         # 这里假设取序列的第一个输出
         out = self.output_layer(x)
+        out = out.squeeze(2).squeeze(1) 
         return out
 
 model = DeepSeekModel(input_dim, hidden_size, num_layers, num_heads)
