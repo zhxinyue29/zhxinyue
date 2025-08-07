@@ -444,18 +444,13 @@ class GradientMonitor:
 # === 新增: SmoothL1损失函数 ===
 
 class RLoss(nn.Module):
-    def __init__(self, supervised_criterion, base_loss_weight=0.5, special_event_id=3):
+    def __init__(self, supervised_criterion, base_loss_weight=0.5):
         super().__init__()
         self.base_loss_weight = base_loss_weight
         self.supervised_criterion = supervised_criterion
     
     def forward(self, model_outputs, targets, reward):
-        # 1. 基础监督损失 - 保持价格预测能力
-        if isinstance(model_outputs, dict):
-            value_pred = model_outputs["value"]
-        else:
-            value_pred = model_outputs[:, -1, 0]  # 处理三维张量
-        supervised_loss = self.supervised_criterion(value_pred, targets)
+        supervised_loss = self.supervised_criterion(model_outputs, targets)
  
         # 3. 分情况处理的策略损失
         policy_loss, match_rate = self.calculate_policy_loss(
@@ -484,24 +479,34 @@ class RLoss(nn.Module):
             "match_rate": match_rate
         }
     
-    def calculate_policy_loss(self, model_outputs, targets, reward, event_targets):
-        # 将策略输出转换为概率分布
-        action_probs = F.softmax(model_outputs["policy"], dim=1)
-        position_direction = torch.argmax(action_probs, dim=1)
-        
+    def calculate_policy_loss(self, model_outputs, targets, reward):
+        logits = model_outputs["logits"]
+        print(f"Input logits shape: {logits.shape}")
+    
+        action_probs = F.softmax(logits, dim=0)
+        position_direction = torch.argmax(action_probs)
+        # 3. 转换targets和reward为张量并确保正确形状
+        if not isinstance(targets, torch.Tensor):
+            targets = torch.tensor([targets], device=logits.device, dtype=logits.dtype)
+        elif targets.dim() == 0:
+            targets = targets.unsqueeze(0)  # 确保[1]形状
+            
+        if not isinstance(reward, torch.Tensor):
+            reward = torch.tensor([reward], device=logits.device, dtype=logits.dtype)
+        elif reward.dim() == 0:
+            reward = reward.unsqueeze(0)  # 确保[1]形状
         # 基础策略逻辑（适用于普通事件）
         risk_mask = targets < -0.05  # 价格下跌超过5%视为高风险
-        valid_actions = torch.zeros_like(position_direction)  # 默认持有动作
-        
-        # 高风险情境下强制保守动作
-        valid_actions[risk_mask] = 3  # 高风险时建议空仓/避险动作
-        
+        # 单样本
+        valid_actions = torch.tensor([0], device=logits.device)
+        if risk_mask.item() if risk_mask.dim() == 0 else risk_mask[0]:
+            valid_actions = torch.tensor([3], device=logits.device)
+                
         # 计算匹配率 (策略与风险建议的一致性)
         directional_match = (position_direction == valid_actions).float()
-        match_rate = directional_match.mean()
         
         # 统一策略损失计算 (不分事件类型)
-        chosen_probs = torch.gather(action_probs, 1, position_direction.unsqueeze(1)).squeeze()
+        chosen_probs = action_probs[position_direction]
         log_probs = torch.log(chosen_probs + 1e-8)
         
         # 风险调整奖励 (高风险情形加强信号)
@@ -509,7 +514,7 @@ class RLoss(nn.Module):
         
         # 策略损失计算
         rl_loss = -torch.mean(log_probs * risk_adjusted_reward * (1.0 + 0.5 * directional_match))
-        
+        match_rate = directional_match
         return rl_loss, match_rate
     
     def dynamic_weight_adjust(self, volatility):
@@ -535,10 +540,20 @@ class SafeSmoothL1Loss(nn.Module):
         super().__init__()
         self.beta = beta
      
-    def forward(self, input, target):
-        if input.shape != target.shape:
-            raise ValueError(f"输入和目标的形状不一致：{input.shape} vs {target.shape}")
-        safe_input = torch.clamp(input, -50, 50)
+    def forward(self, model_outputs, target):
+        if isinstance(model_outputs, dict):
+        # 尝试常见键名（根据实际模型输出键名调整）
+            if "logits" in model_outputs:
+                input_tensor = model_outputs["logits"]
+            elif "value" in model_outputs:
+                input_tensor = model_outputs["value"]
+            else:
+                # 如果没有标准键名，使用第一个值
+                input_tensor = next(iter(model_outputs.values()))
+        else:
+            input_tensor = model_outputs
+        print("model_outputs",input_tensor)
+        safe_input = torch.clamp(input_tensor, -50, 50)
         safe_target = torch.clamp(target, -50, 50)
         diff = safe_input - safe_target
         diff = torch.where(torch.isinf(diff), torch.zeros_like(diff), diff)

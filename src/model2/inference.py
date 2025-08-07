@@ -81,11 +81,12 @@ class DeepSeekModel(nn.Module):
         x = self.transformer(x)
         # 转换回 [batch_size, seq_len, hidden_size]
         x = x.permute(1, 0, 2)
-        # 根据任务需要，可能加池化或特定位置输出
-        # 这里假设取序列的第一个输出
-        out = self.output_layer(x)
-        out = out.squeeze(2).squeeze(1) 
-        return out
+        # 关键修改：只取最后一个时间步
+        last_step = x[:, -1, :]  # [16, hidden_size]
+        
+        # 通过输出层并压缩
+        output = self.output_layer(last_step)  # [16, 1]
+        return output.squeeze(1)  # [16]
 
 model = DeepSeekModel(input_dim, hidden_size, num_layers, num_heads)
 print('实例化模型类型：', type(model))
