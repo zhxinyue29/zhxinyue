@@ -25,9 +25,7 @@ print(input_tensor.dtype)
 # 定义预测函数（你已经定义过，可直接使用）
 def predict(model, input_tensor):
     model.eval()
-    with torch.no_grad():
-        output = model(input_tensor)
-    return output
+    return model(input_tensor)
 
 
 

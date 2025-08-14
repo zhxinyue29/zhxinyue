@@ -3,32 +3,31 @@ env:
   train_data_path: '/home/liyakun/twitter-stock-prediction/data/splits/train/'  # 股票数据路径
   test_data_path: '/home/liyakun/twitter-stock-prediction/data/splits/test/' 
   action_space_size: 773  # 动作空间大小
-  state_space_size: 773  # 状态空间大小
-  initial_balance: 10000  # 初始资金
-  transaction_fee: 0.001
-  max_holding_days: 30
-  reward_type: 'sparse'
-  hidden_size: 30
-  num_layers: 6
-  num_heads: 6
+  hidden_size: 1536
+  num_layers: 28
+  num_heads: 12
   
   # 其他环境设置...
 
 training:
-  algorithm: 'PPO'  # 使用的强化学习算法
-  total_timesteps: 10000  # 训练总步数
   learning_rate: 1e-5  # 学习率
-  gamma: 0.99  # 折扣因子
   batch_size: 16
   epochs: 50
-  special_event_id: 3
   base_loss_weight: 0.6
   
   # 其他强化学习相关参数...
 
 paths:
-  output_model: 'models/model1/best_model.pt'  # 保存模型1的路径
-  log_file: 'logs/model1_train.log'  # 日志文件路径
+  # 训练/验证/测试数据集路径
+  train_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv"
+  val_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv"
+  test_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/test_dataset.csv"
+  
+  # 模型和输出路径
+  output_model: "results/models/model1.pt"
+  log_file: "logs/model1_training.log"
+  processed_output_dir: "data/processed/model1_output"
+  eval_output_dir: "results/model1_eval"
   eval_output_path: 'results/model1_eval/evaluation_results.csv'
 
 predict:
@@ -39,13 +38,12 @@ model:
   name: 'transformer'
   params:
     vocab_size: 151936  # 词汇表大小
-    hidden_size: 1024   # 隐藏层维度
-    num_layers: 16     # Transformer层数
+    hidden_size: 1536   # 隐藏层维度
+    num_layers: 28     # Transformer层数
     action_space_size: 773
     num_attention_heads: 8
     intermediate_size: 5012
     input_dim: 773
-    special_event_id: 3
 
 stability:
   max_nan_allowed: 0       # 输入中允许的最大NaN值数量(0表示不允许任何NaN)
