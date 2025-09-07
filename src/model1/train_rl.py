@@ -1,5 +1,9 @@
+import math
+from transformers import AutoConfig, AutoTokenizer
 import os
 import re
+from collections import OrderedDict
+from venv import logger
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -18,8 +22,9 @@ import torch.nn.functional as F
 from contextlib import contextmanager
 import inspect
 import warnings
-from ..model2.inference import load_model, predict, DeepSeekModel
+from ..model2.inference import DeepSeekPredictor
 from transformers import AutoTokenizer, AutoModel  
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 
 if torch.cuda.is_available():
@@ -39,8 +44,6 @@ class SafetyModule(nn.Module):  # 🔴 关键：继承nn.Module
     
     def forward(self, x):
         return self.protector(x)
-    
-safety = SafetyModule()
 
 config_path = '/home/liyakun/twitter-stock-prediction/configs/model1.yaml'
 def load_model(config_path):
@@ -56,7 +59,6 @@ def load_model(config_path):
         return None
 config = load_model(config_path)
 
-
 try:
     model_path = config['env']['prediction_model_path']
     print("模型路径：", model_path)
@@ -67,23 +69,8 @@ if not config:
     raise RuntimeError("配置加载失败！")
 
 # 提取参数和模型路径
-try:
-    hidden_size = config['env']['hidden_size']
-    num_layers = config['env']['num_layers']
-    num_heads = config['env']['num_heads']
-    model_path = config['env']['prediction_model_path']
-    input_dim=config['model']['params']['input_dim']
-except KeyError as e:
-    raise RuntimeError(f"配置缺少字段: {e}")
-# 根据配置路径加载模型
-if model_path:
-    model2 = DeepSeekModel(input_dim,hidden_size, num_layers, num_heads)
-    model2 = model2.to(device)
-    safety = safety.to(device)
-    print("加载的model2类型：", type(model2))
-    assert model2 is not None, "模型加载失败，model2为None！"
-else:
-    print("未提供模型路径，无法加载模型。")
+
+
 
 class ConfigLoader:
     def __init__(self, config_path: str):
@@ -531,367 +518,1151 @@ class SafeSmoothL1Loss(nn.Module):
             return torch.zeros_like(loss)
             
         return loss
-
 class CSVDataset(Dataset):
-    def __init__(self, x_file: str, y_file: str, dates_file: str, 
-                 filter_nan=True, 
-                 sequence_length=30,
-                 feature_names=None):
+    def __init__(
+        self,
+        data_path: Optional[str] = None,
+        filter_nan: bool = True,
+        sequence_length: int = 30,
+        feature_names: Optional[List[str]] = None,
+        exclude_text_columns: bool = True,
+        min_valid_sequences: int = 100,
+        logger: Optional[logging.Logger] = None
+    ):
+        super().__init__()
+        self.logger = logger or setup_logger(self.__class__.__name__)
+        self.sequence_length = sequence_length
+        self.filter_nan = filter_nan
+        self.feature_names = feature_names
+        self.exclude_text_columns = exclude_text_columns
+        self.min_valid_sequences = min_valid_sequences
+        
+        self.logger.info(f"🔍 加载数据文件: {data_path}")
+        self.logger.info(f"序列长度: {sequence_length}, 过滤NaN: {filter_nan}, 最小序列数: {min_valid_sequences}")
+        self.logger.info("=" * 50)
+        
+        # 错误日志文件路径
+        error_log_dir = "logs"
+        os.makedirs(error_log_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.error_log_path = os.path.join(error_log_dir, f"data_parse_errors_{timestamp}.log")
+        
+        # 1. 加载原始数据文本
+        self.logger.info("📥 读取原始数据...")
+        try:
+            with open(data_path, 'r', encoding='utf-8', errors='replace') as f:
+                raw_lines = f.readlines()
+        except Exception as e:
+            self.logger.error(f"❌ 文件读取错误: {str(e)}")
+            raise
+        
+        self.logger.info(f"📄 读取 {len(raw_lines)} 行数据")
+        
+        # 2. 提取结构化数据
+        self.logger.info("\n⚙️ 解析结构化数据...")
+        data_records = []
+        valid_count = 0
+        error_count = 0
+        
+        # 打印前5行用于调试
+        self.logger.info(f"🔍 前5行原始数据内容:")
+        for i, line in enumerate(raw_lines[:5], 1):
+            self.logger.info(f"行 {i} 原始内容: {line.strip()[:200]}")
+        
+        with open(self.error_log_path, "w", encoding="utf-8") as error_log:
+            self.logger.info(f"开始解析... (错误日志将保存到: {self.error_log_path})")
+            
+            for i, line in enumerate(raw_lines, 1):
+                if i % 1000 == 0 or i <= 5 or i == len(raw_lines):
+                    self.logger.info(f"处理中... 已处理: {i}/{len(raw_lines)} 行")
+                
+                try:
+                    if not line.strip():
+                        continue
+                        
+                    # 尝试解析行
+                    record = self._parse_hydra_format(line)
+                    
+                    # DEBUG: 打印前5行的解析结果
+                    if i <= 5:
+                        self.logger.info(f"行 {i} 解析结果: {str(record)[:300]}")
+                    
+                    # 检查解析结果
+                    if not isinstance(record, dict) or not record:
+                        raise ValueError("解析结果为空或不是字典")
+                        
+                    # 🔑 键名规范化处理 (核心修改)
+                    normalized_record = {}
+                    for key, value in record.items():
+                        # 标准化键名: 小写，去掉前后空格，替换空格为下划线
+                        clean_key = str(key).strip().lower().replace(" ", "_")
+                        normalized_record[clean_key] = value
+                    
+                    record = normalized_record
+                    
+                    # 检查必要字段
+                    missing_fields = []
+                    if 'timestamp' not in record:
+                        missing_fields.append('timestamp')
+                        record['timestamp'] = pd.Timestamp.now()
+                    
+                    if 'symbol' not in record:
+                        missing_fields.append('symbol')
+                        record['symbol'] = f"UNKNOWN_{i}"
+                    
+                    if 'sentiment' not in record:
+                        missing_fields.append('sentiment')
+                        record['sentiment'] = 0.0
+                    
+                    # 如果有缺失字段，记录警告
+                    if missing_fields:
+                        self.logger.debug(f"行 {i}: 缺失必要字段 {', '.join(missing_fields)}，已添加默认值")
+                    
+                    # 类型转换确保正确
+                    try:
+                        if isinstance(record['timestamp'], str):
+                            record['timestamp'] = pd.to_datetime(record['timestamp'], errors='coerce')
+                        if not isinstance(record['timestamp'], pd.Timestamp):
+                            record['timestamp'] = pd.Timestamp.now()
+                    except Exception:
+                        record['timestamp'] = pd.Timestamp.now()
+                    
+                    try:
+                        record['sentiment'] = float(record['sentiment'])
+                    except:
+                        record['sentiment'] = 0.0
+                    
+                    # 添加记录
+                    data_records.append(record)
+                    valid_count += 1
+                    
+                except Exception as e:
+                    error_count += 1
+                    # 记录详细错误信息
+                    error_details = {
+                        "error": str(e),
+                        "line_number": i,
+                        "raw_content": line.strip()[:500],
+                        "parsed_result": str(record)[:300] if "record" in locals() else "未解析"
+                    }
+                    error_log.write(json.dumps(error_details, indent=2) + "\n\n")
+                    
+                    if error_count % 100 == 0:
+                        self.logger.warning(f"解析错误数已达 {error_count} (最后错误: {str(e)})")
+        
+        self.logger.info(f"✅ 成功解析 {valid_count} 条记录")
+        self.logger.info(f"⚠️ 解析错误: {error_count} 条 (详细日志: {self.error_log_path})")
+        
+        # 如果有效记录少于阈值，发出严重警告
+        if valid_count < min_valid_sequences:
+            self.logger.warning(f"⚠️ 有效记录数 ({valid_count}) 低于阈值 ({min_valid_sequences})")
+        
+        # 3. 创建DataFrame
+        self.logger.info("\n📊 创建DataFrame...")
+        self.df = pd.DataFrame(data_records) if data_records else pd.DataFrame()
+        
+        if self.df.empty:
+            self.logger.warning("⚠️ 警告: DataFrame为空，添加占位符")
+            self.df = pd.DataFrame({
+                'timestamp': [pd.Timestamp.now() for _ in range(sequence_length)],
+                'symbol': ['PLACEHOLDER' for _ in range(sequence_length)],
+                'sentiment': [0.0 for _ in range(sequence_length)]
+            })
+        
+        self.logger.info(f"📋 数据集包含 {self.df['symbol'].nunique()} 只股票/组")
+        
+        # 4. 处理文本列
+        if exclude_text_columns:
+            text_columns = [col for col in self.df.columns if col in ['text', 'content', 'message']]
+            self.logger.info(f"📝 排除 {len(text_columns)} 个文本列: {text_columns}")
+            self.df = self.df.drop(columns=text_columns, errors='ignore')
+        
+        # 5. 确定特征列
+        self.feature_names = self._detect_features() if feature_names is None else feature_names
+        if not self.feature_names:
+            self.logger.warning("⚠️ 自动重新确定特征名称: 0 个特征")
+        
+        # 6. 清理和转换
+        self.logger.info("\n🛠️ 数据清理和转换...")
+        self._clean_and_transform()
+        
+        # 7. 创建序列
+        self.logger.info("\n⏱️ 创建序列...")
+        self._create_sequences()
+        
+        # 8. 过滤NaN序列
+        self.logger.info("\n🧹 过滤NaN序列...")
+        self._filter_nan_sequences()
+        
+        self.logger.info("\n🎉 数据集初始化完成")
+        self.logger.info(f"📊 数据集统计:\n{self.get_data_report()}")
+
+    def _parse_hydra_format(self, line: str) -> dict:
+        """解析多种格式的时间序列数据，特别针对Python字典字符串格式"""
+        try:
+            # 清理输入
+            clean_line = line.strip()
+            
+            # 新增：处理日志中错误类型2的情况 - 外部双引号包裹问题
+            # 示例: "\"{'symbol': 'GOOG', ...}\""
+            if clean_line.startswith('"') and clean_line.endswith('"'):
+                inner = clean_line[1:-1]
+                # 如果内容本身是有效的字典格式，尝试解析
+                if inner.startswith("{") or inner.startswith("'{"):
+                    clean_line = inner
+            
+            # 1. 尝试使用ast.literal_eval（最可能处理Python字典格式）
+            try:
+                import ast
+                parsed = ast.literal_eval(clean_line)
+                if isinstance(parsed, dict):
+                    return parsed
+            except (SyntaxError, ValueError, TypeError):
+                pass
+            
+            # 新增：更全面的单引号转双引号处理
+            # 处理类似: '{...}' 或 '{"key": "value"}' 格式
+            if clean_line.startswith("{") or clean_line.startswith("{"):
+                # 分步骤转换以确保安全
+                normalized = clean_line
+                # 替换单引号键和值
+                normalized = re.sub(r"'\s*:\s*'", '": "', normalized)  # 键值对
+                normalized = re.sub(r"'\s*,\s*'", '", "', normalized)  # 键值对之间
+                normalized = normalized.replace("{'", '{"').replace("'}", '"}')  # 大括号
+                normalized = normalized.replace(": '", ': "').replace("',", '",')  # 通用替换
+                
+                # 处理特殊字符
+                normalized = normalized.replace("None", "null")
+                normalized = normalized.replace("True", "true").replace("False", "false")
+                
+                # 尝试解析转换后的字符串
+                try:
+                    return json.loads(normalized)
+                except json.JSONDecodeError:
+                    pass
+            
+            # 2. 尝试直接解析为JSON
+            try:
+                return json.loads(clean_line)
+            except json.JSONDecodeError:
+                pass
+            
+            # 3. 尝试转换为JSON格式（保留原始逻辑）
+            try:
+                json_str = (
+                    clean_line
+                    .replace("'", '"')  # 替换单引号为双引号
+                    .replace("None", "null")  # Python None → JSON null
+                    .replace("True", "true")  # Python True → JSON true
+                    .replace("False", "false")  # Python False → JSON false
+                    .replace("\\\"", "'")  # 处理转义的双引号
+                )
+                return json.loads(json_str)
+            except json.JSONDecodeError:
+                pass
+            
+            # 4. 尝试处理嵌套引号（保留原始逻辑）
+            try:
+                # 使用正则表达式处理复杂引号结构
+                pattern = r'("[^"]*"|\'[^\']*\')'
+                fixed_line = re.sub(pattern, lambda m: m.group(0).replace('"', "!QUOTE!"), clean_line)
+                fixed_line = fixed_line.replace("'", '"').replace('!QUOTE!', "'")
+                return json.loads(fixed_line)
+            except:
+                pass
+            if clean_line.startswith('{') and not clean_line.endswith('}'):
+            # 尝试补全缺少的结束花括号
+                fixed_line = clean_line.rstrip()  # 移除可能的空白字符
+                if not fixed_line.endswith('}') and not fixed_line.endswith('"'):
+                    # 添加缺失的结束结构
+                    if fixed_line.rfind(',') > fixed_line.rfind(':'):
+                        # 类似 'key' 这种不完整键的情况
+                        fixed_line = fixed_line.rsplit(',', 1)[0] + '}'
+                    else:
+                        fixed_line += '}'
+                        
+                    # 尝试解析修复后的数据
+                    try:
+                        return self._parse_hydra_format(fixed_line)
+                    except:
+                        pass
+            
+            return {}
+        
+        except Exception as e:
+            self.logger.debug(f"解析函数内部错误: {str(e)}")
+            return {}
+
+    def _detect_features(self) -> List[str]:
+        """自动检测数值特征列"""
+        if self.df.empty:
+            return []
+        
+        # 排除非数值列和关键列
+        non_features = ['symbol', 'timestamp', 'sentiment', 'text', 'content', 'message', 'id']
+        numeric_cols = self.df.select_dtypes(include=['number', 'float', 'int']).columns.tolist()
+        
+        # 过滤非特征列
+        features = [col for col in numeric_cols if col not in non_features]
+        self.logger.info(f"📊 自动识别出 {len(features)} 个特征列: {features[:10]}{'...' if len(features) > 10 else ''}")
+        return features
+
+    def _clean_and_transform(self):
+        """数据清理和转换"""
+        # 1. 填充缺失值
+        if self.df.empty:
+            self.logger.warning("🧼 填充缺失值 (跳过，数据集为空)")
+            return
+            
+        missing_values = self.df.isnull().sum().sum()
+        if missing_values > 0:
+            self.logger.info(f"🧼 填充缺失值 (共 {missing_values} 个)")
+            self.df = self.df.ffill().bfill().fillna(0)
+        else:
+            self.logger.info("🧼 无缺失值")
+
+    def _create_sequences(self):
+        """为每个股票/分组创建时间序列"""
+        if self.df.empty:
+            self.logger.warning("⚠️ 警告: 未创建任何序列，使用占位符")
+            self.sequences = [np.zeros((self.sequence_length, 1))]  # 创建一个占位符序列
+            self.targets = [0.0]
+            return
+        
+        self.sequences = []
+        self.targets = []
+        
+        # 按股票分组处理
+        for symbol, group in self.df.groupby('symbol'):
+            group = group.sort_values('timestamp')
+            
+            # 确保有足够的数据点
+            if len(group) < self.sequence_length:
+                self.logger.debug(f"跳过{symbol}: 数据点不足 ({len(group)} < {self.sequence_length})")
+                continue
+            
+            # 提取特征和标签
+            features = group[self.feature_names].values if self.feature_names else np.zeros((len(group), 1))
+            sentiments = group['sentiment'].values
+            
+            # 创建序列
+            for i in range(len(group) - self.sequence_length):
+                seq = features[i:i+self.sequence_length]
+                target = sentiments[i+self.sequence_length-1]
+                self.sequences.append(seq)
+                self.targets.append(target)
+        
+        if not self.sequences:
+            self.logger.warning("⚠️ 警告: 未创建任何有效序列，使用占位符")
+            self.sequences = [np.zeros((self.sequence_length, 1))]
+            self.targets = [0.0]
+            
+        self.logger.info(f"✅ 创建了 {len(self.sequences)} 个时间序列 (来自 {self.df['symbol'].nunique()} 只股票)")
+        self.logger.info(f"📐 序列形状: {self.sequences[0].shape}")
+
+    def _filter_nan_sequences(self):
+        """过滤包含NaN的序列"""
+        if not self.filter_nan:
+            self.logger.info("跳过过滤NaN序列")
+            return
+            
+        original_count = len(self.sequences)
+        valid_indices = [i for i, seq in enumerate(self.sequences) if not np.isnan(seq).any()]
+        
+        self.sequences = [self.sequences[i] for i in valid_indices]
+        self.targets = [self.targets[i] for i in valid_indices]
+        
+        filtered_count = original_count - len(self.sequences)
+        self.logger.info(f"✅ 所有 {len(self.sequences)} 个序列均有效 (过滤了 {filtered_count} 个无效序列)")
+        
+        # 如果序列数量不足，添加占位符
+        if len(self.sequences) < self.min_valid_sequences:
+            self.logger.warning(f"⚠️ 序列数量不足 ({len(self.sequences)} < {self.min_valid_sequences})，添加占位符")
+            placeholder = np.zeros((self.sequence_length, len(self.feature_names) if self.feature_names else 1))
+            self.sequences.append(placeholder)
+            self.targets.append(0.0)
+
+    def get_data_report(self) -> str:
+        """生成数据集报告"""
+        report = f"  序列数量: {len(self.sequences)}\n"
+        if self.sequences:
+            report += f"  序列长度: {self.sequence_length}\n"
+            report += f"  特征维度: {self.sequences[0].shape[1]}\n"
+            report += f"  序列形状: {self.sequences[0].shape}\n"
+        
+        if not self.df.empty:
+            report += f"  数据起始时间: {self.df['timestamp'].min()}\n"
+            report += f"  数据结束时间: {self.df['timestamp'].max()}\n"
+            report += f"  股票数量: {self.df['symbol'].nunique()}\n"
+            report += "  情感分布:\n"
+            report += f"    中性: {np.sum(self.df['sentiment'] == 0)}\n"
+            report += f"    积极: {np.sum(self.df['sentiment'] > 0)}\n"
+            report += f"    消极: {np.sum(self.df['sentiment'] < 0)}"
+        
+        return report
+    def __len__(self) -> int:
+        """返回数据集中序列的数量"""
+        return len(self.sequences)
+    
+    def __getitem__(self, index: int) -> tuple:
         """
-        针对市场推特数据优化的CSVDataset
+        获取索引对应的数据样本
         
         参数:
-            x_file: 包含特征的CSV文件路径
-            y_file: 包含标签的CSV文件路径
-            dates_file: 包含日期的CSV文件路径
-            filter_nan: 是否过滤包含NaN的样本 (默认为True)
-            sequence_length: 时间序列长度 (默认为30)
-            feature_names: 可选特征名称列表
+            index (int): 样本索引
+            
+        返回:
+            tuple: (sequence_tensor, sentiment_target, metadata)
+                   包含特征序列张量、情感目标值和其他元数据
         """
-        print("Loading data files:")
-        print("x_file:", x_file)
-        print("y_file:", y_file)
-        print("dates_file:", dates_file)        
+        # 1. 确保索引有效
+        if index < 0 or index >= len(self.sequences):
+            raise IndexError(f"索引 {index} 超出范围 [0, {len(self.sequences)-1}]")
+        
+        # 2. 获取序列特征和目标
+        sequence = self.sequences[index]
+        sentiment = self.targets[index]
+        
+        # 3. 转换为张量（非常重要！）
         try:
-            # 1. 加载数据文件
-            self.df = pd.read_csv(x_file)
-            self.label_df = pd.read_csv(y_file) if y_file else None
-            self.dates_df = pd.read_csv(dates_file) if dates_file else None            
-            # 打印基本信息
-            print("Data shapes:")
-            print("x_data:", self.df.shape)
-            print("y_data:", self.label_df.shape if self.label_df is not None else "None")
-            print("dates:", self.dates_df.shape if self.dates_df is not None else "None")            
+            # 确保数据类型正确 - 使用 float32 精度
+            sequence_tensor = torch.tensor(sequence, dtype=torch.float32)
+            sentiment_target = torch.tensor([sentiment], dtype=torch.float32)  # 使其变为张量形式
         except Exception as e:
-            print(f"Error loading CSV files: {e}")
-            raise
-            
-        # 2. 解析JSON字段（如果存在）
-        self._parse_json_columns()
+            # 如果转换失败，记录错误并尝试处理
+            self.logger.error(f"张量转换错误（索引 {index}）: {e}")
+            # 回退方案：创建占位符序列
+            sequence_tensor = torch.zeros(
+                (self.sequence_length, len(self.feature_names) if self.feature_names else 1),
+                dtype=torch.float32
+            )
+            sentiment_target = torch.tensor([0.0], dtype=torch.float32)
         
-        # 3. 合并data, label, date
-        self._merge_dataframes()
+        # 4. 获取元数据（可选，但有价值）
+        metadata = {
+            'sequence_id': index,
+            'features': self.feature_names,
+            'sequence_length': self.sequence_length
+        }
         
-        # 4. 验证数据一致性
-        assert len(self.x_data) == len(self.y_data), "x和y行数不一致"
-        if self.dates_df is not None:
-            assert len(self.x_data) == len(self.dates_df), "x和dates行数不一致"
-            
-        # 5. 创建时间序列
-        self._create_sequences(sequence_length)
-        
-        # 6. 过滤NaN值
-        if filter_nan:
-            self._filter_nan_samples()
-            
-        self.feature_names = feature_names
-        if self.feature_names is None:
-            self.feature_names = [f'Feature_{i}' for i in range(self.x_data.shape[1])]
-        
-        # 7. 打印最终形状
-        print(f"创建序列后形状 - x_data: {self.x_data.shape}, y_data: {self.y_data.shape}")
-        
-    def _parse_json_columns(self):
-        """解析CSV中的JSON格式列"""
-        print("解析JSON格式列...")
-        json_columns = []
-        
-        # 检查df中的JSON列
-        for col in self.df.columns:
-            if self.df[col].dtype == 'object' and self.df[col].str.startswith('{').any():
-                json_columns.append(col)
-                self.df[col] = self.df[col].apply(self._safe_parse_json)
-                print(f"解析JSON列: {col}")
-        
-        # 创建特征列
-        self._create_feature_columns()
-    
-    def _safe_parse_json(self, json_str):
-        """安全解析JSON字符串"""
-        if pd.isnull(json_str):
-            return {}
-        try:
-            # 处理不标准的引号
-            json_str = json_str.replace('""', '"')
-            return json.loads(json_str)
-        except (json.JSONDecodeError, TypeError):
-            try:
-                # 尝试替换单引号
-                json_str = json_str.replace("'", '"')
-                return json.loads(json_str)
-            except:
-                return {}
-    
-    def _create_feature_columns(self):
-        """从JSON结构中创建特征列"""
-        # 市场数据特征
-        if 'market_context' in self.df.columns:
-            market_data = self.df['market_context']
-            self.df['open'] = market_data.apply(lambda x: x.get('open', np.nan))
-            self.df['high'] = market_data.apply(lambda x: x.get('high', np.nan))
-            self.df['low'] = market_data.apply(lambda x: x.get('low', np.nan))
-            self.df['close'] = market_data.apply(lambda x: x.get('close', np.nan))
-            self.df['volume'] = market_data.apply(lambda x: x.get('volume', np.nan))
-        
-        # 技术指标特征
-        if 'technical_indicators' in self.df.columns:
-            tech_data = self.df['technical_indicators']
-            self.df['sma'] = tech_data.apply(lambda x: x.get('sma', np.nan))
-            self.df['ema'] = tech_data.apply(lambda x: x.get('ema', np.nan))
-            self.df['rsi'] = tech_data.apply(lambda x: x.get('rsi', np.nan))
-            self.df['bollinger_upper'] = tech_data.apply(lambda x: x.get('bollinger_upper', np.nan))
-            self.df['bollinger_lower'] = tech_data.apply(lambda x: x.get('bollinger_lower', np.nan))
-        
-        # 推特元数据特征
-        if 'tweet_metadata' in self.df.columns:
-            tweet_data = self.df['tweet_metadata']
-            self.df['retweet_count'] = tweet_data.apply(lambda x: x.get('retweet_count', 0))
-            self.df['favorite_count'] = tweet_data.apply(lambda x: x.get('favorite_count', 0))
-            self.df['mention_count'] = tweet_data.apply(lambda x: len(x.get('mentioned_symbols', [])))
-    
-    def _merge_dataframes(self):
-        """合并data, label和date数据帧"""
-        # 提取基础特征列
-        base_features = ['symbol', 'timestamp', 'sentiment', 'text',
-                         'open', 'high', 'low', 'close', 'volume',
-                         'sma', 'ema', 'rsi', 'bollinger_upper', 'bollinger_lower',
-                         'retweet_count', 'favorite_count', 'mention_count']
-        
-        # 创建最终特征矩阵
-        feature_cols = [col for col in base_features if col in self.df.columns]
-        self.x_data = self.df[feature_cols].values
-        
-        # 创建标签向量
-        if self.label_df is not None:
-            # 如果是单列标签文件
-            if len(self.label_df.columns) == 1:
-                self.y_data = self.label_df.values
-            else:
-                # 尝试从标签文件识别目标列
-                for col in ['target', 'label', 'close']:
-                    if col in self.label_df.columns:
-                        self.y_data = self.label_df[col].values
-                        break
-                else:
-                    # 如果没有找到有效的标签列，抛出一个详细的错误
-                    available_cols = list(self.label_df.columns)
-                    if len(available_cols) > 5:
-                        available_cols = available_cols[:5] + ["..."]
-                    
-                    raise ValueError(
-                        f"❌ 无法识别标签列。候选列名 {self.label_df.columns} 均不存在于标签文件中。\n"
-                        f"标签文件包含的列: {available_cols}\n"
-                        f"请通过以下方式之一解决:\n"
-                        f"1. 在标签文件中添加 'target' 或 'label' 列\n"
-                        f"2. 指定代码中使用的实际标签列名"
-                )
-        else:
-            # 如果没提供标签文件，尝试从特征数据中提取标签
-            if 'close' in self.df.columns:
-                print("警告：使用特征数据中的'close'作为标签")
-                self.y_data = self.df['close'].values
-            else:
-                raise ValueError("无法确定标签列")
-        
-        # 创建日期向量
-        if self.dates_df is not None:
-            # 尝试识别日期列
-            for col in ['date', 'timestamp', 'time']:
-                if col in self.dates_df.columns:
-                    self.dates = self.dates_df[col].values
-                    break
-            else:
-                # 如果没有找到，取第一列作为日期
-                    available_cols = list(self.dates_df.columns)
-                    if len(available_cols) > 5:
-                        available_cols = available_cols[:5] + ["..."]
-                    
-                    raise ValueError(
-                        f"❌ 无法识别标签列。候选列名 {self.label_df.columns} 均不存在于标签文件中。\n"
-                        f"标签文件包含的列: {available_cols}\n"
-                        f"请通过以下方式之一解决:\n"
-                        f"1. 在标签文件中添加 'target' 或 'label' 列\n"
-                        f"2. 指定代码中使用的实际标签列名"
-                )
-        else:
-            # 如果没提供日期文件，尝试从特征数据中提取日期
-            if 'timestamp' in self.df.columns:
-                print("警告：使用特征数据中的'timestamp'作为日期")
-                self.dates = self.df['timestamp'].values
-            else:
-                self.dates = np.arange(len(self.x_data))
-    
-    def _create_sequences(self, sequence_length):
-        """创建时间序列序列"""
-        sequences = []
-        labels = []
-        date_sequences = []
-        
-        # 按时间序列长度创建序列
-        for i in range(len(self.x_data) - sequence_length):
-            sequences.append(self.x_data[i:i+sequence_length])
-            labels.append(self.y_data[i+sequence_length])  # 预测下一个时间点的标签
-            date_sequences.append(self.dates[i:i+sequence_length])
-        
-        self.x_data = np.array(sequences)
-        self.y_data = np.array(labels)
-        self.dates = np.array(date_sequences)
-        
-        print(f"创建时间序列: {len(self.x_data)} 个序列 (长度: {sequence_length})")
-        print(f"序列形状: x_data {self.x_data.shape}, y_data {self.y_data.shape}")
-    
-    def _filter_nan_samples(self):
-        """过滤包含NaN的样本"""
-        original_count = len(self.x_data)
-        
-        # 创建有效索引列表
-        valid_indices = [
-            i for i in range(original_count)
-            if not np.isnan(self.x_data[i]).any() and not np.isnan(self.y_data[i]).any()
-        ]
-        
-        # 应用过滤
-        self.x_data = self.x_data[valid_indices]
-        self.y_data = self.y_data[valid_indices]
-        self.dates = self.dates[valid_indices] if self.dates is not None else None
-        
-        filtered_count = original_count - len(valid_indices)
-        print(f"过滤掉包含NaN的样本: {filtered_count}/{original_count}")
-    
-    def __len__(self):
-        return len(self.x_data)
-    
-    def __getitem__(self, idx):
-        data = self.x_data[idx]
-        label = self.y_data[idx]
-        date = self.dates[idx]
-        
-        # 转换为Tensor
-        data = torch.tensor(data, dtype=torch.float32) 
-        label = torch.tensor(label, dtype=torch.float32)
-        
-        # 数据清洗
-        if torch.isnan(data).any():
-            data = torch.nan_to_num(data, nan=0.0)
-        if torch.isinf(data).any():
-            data = torch.nan_to_num(data, posinf=1e6, neginf=-1e6)
-        
-        # 返回包含事件标签的三元组
-        return data, label, date
-    
-    def get_event_names(self):
-        """获取所有事件名称列表"""
-        return []  # 您的原始代码中有此函数
-    
-    def get_special_event_id(self):
-        """获取特殊事件ID"""
-        return 3  # 您的原始代码中有此函数
-
+        return sequence_tensor, sentiment_target, metadata
+# 设置日志
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 class TransformerModel(nn.Module):
-    """Transformer模型定义，匹配预训练权重结构"""
-    def __init__(self, model_name: str, output_size: int = 4):
+    """Deepseek 1.5B兼容模型（完全匹配预训练权重命名）"""
+    def __init__(
+        self,
+        tokenizer_path: str = "",
+        model_weights_path: Optional[str] = None,
+        vocab_size: int = 51200,
+        hidden_size: int = 1536,
+        num_heads: int = 24,
+        num_kv_heads: int = 4,
+        hidden_size_mlp: int = 8960,
+        num_layers: int = 30,
+        output_size: int = 1,
+        max_seq_len: int = 4096,
+        device: Optional[torch.device] = None
+    ):
         super().__init__()
-        self.model_name = model_name
-        self.output_size = output_size
+        # 保存模型配置
+        self.config = {
+            "tokenizer_path": tokenizer_path,
+            "model_weights_path": model_weights_path,
+            "vocab_size": vocab_size,
+            "hidden_size": hidden_size,
+            "num_heads": num_heads,
+            "num_kv_heads": num_kv_heads,
+            "hidden_size_mlp": hidden_size_mlp,
+            "num_layers": num_layers,
+            "output_size": output_size,
+            "max_seq_len": max_seq_len
+        }
         
-        # 1. 加载预训练模型和分词器
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.encoder = AutoModel.from_pretrained(model_name)
+        # 1. Token嵌入（用于文本输入）
+        self.embed_tokens = nn.Embedding(vocab_size, hidden_size)
         
-        # 2. 添加适配层输出向量
-        encoder_hidden_size = self.encoder.config.hidden_size
-        self.vector_head = nn.Sequential(
+        # 新增：输入投影层（用于浮点数输入）
+        self.input_projection = nn.Sequential(
+            nn.Linear(1, hidden_size),
+            nn.GELU(),
+            nn.LayerNorm(hidden_size)
+        )
+        
+        # 2. 旋转位置编码
+        self.rotary_emb = RotaryEmbedding(
+            dim=hidden_size // num_heads, 
+            max_seq_len=max_seq_len
+        )
+        
+        # 3. Transformer层堆叠（使用修正后的块）
+        self.layers = nn.ModuleList([
+            DeepseekBlock(
+                hidden_size=hidden_size,
+                num_heads=num_heads,
+                num_kv_heads=num_kv_heads,
+                mlp_size=hidden_size_mlp,
+            )
+            for _ in range(num_layers)
+        ])
+        
+        # 4. 最终归一化层 - 匹配预训练权重命名: norm
+        self.norm = DeepseekRMSNorm(hidden_size)
+        
+        # 5. 输出层
+        self.output = nn.Sequential(
+            nn.Linear(hidden_size, hidden_size),
+            nn.GELU(),
             nn.Dropout(0.1),
-            nn.Linear(encoder_hidden_size, 256),
-            nn.ReLU(),
-            nn.Linear(256, output_size)
-        )
-        self.output_layer = None
-        self.set_output_size(output_size)
-        # 3. 设置特殊token
-        if self.tokenizer.pad_token is None:
-            self.tokenizer.pad_token = self.tokenizer.eos_token or '[PAD]'
-    def set_output_size(self, size: int = None):
-        """动态设置输出维度(也可不设置)"""
-        if size is None:
-            # 保留原始维度
-            self.output_size = self.hidden_size
-            if hasattr(self, 'output_layer'):
-                del self.output_layer  # 移除适配层
-            self.output_layer = nn.Identity()
-            print(f"输出层：保留原始维度 {self.hidden_size}")
-        else:
-            # 添加/调整适配层
-            self.output_size = size
-            if hasattr(self, 'output_layer') and isinstance(self.output_layer, nn.Linear):
-                # 调整现有适配层
-                self.output_layer.out_features = size
-            else:
-                # 新建适配层
-                self.output_layer = nn.Linear(self.hidden_size, size)
-            print(f"输出层：适配到 {size} 维")
-
-    def forward(self, inputs) -> torch.Tensor:  # 直接返回张量
-        """直接返回名为 outputs 的向量（不是字典！）"""
-        # 处理文本输入或张量输入
-        if isinstance(inputs, dict) and 'text' in inputs:
-            # 文本输入模式
-            tokenized = self.tokenizer(
-                inputs['text'],
-                padding=True,
-                truncation=True,
-                return_tensors='pt',
-                max_length=512
-            ).to(self.encoder.device)
-            input_ids = tokenized.input_ids
-            attention_mask = tokenized.attention_mask
-        else:
-            # 张量输入模式
-            input_ids = inputs['input_ids'] if isinstance(inputs, dict) else inputs
-            attention_mask = inputs['attention_mask'] if isinstance(inputs, dict) else None
-        
-        # 提取文本表示
-        encoder_outputs = self.encoder(
-            input_ids=input_ids,
-            attention_mask=attention_mask,
-            return_dict=True
+            nn.Linear(hidden_size, output_size)
         )
         
-        # 使用[CLS]标记作为序列表示
-        last_hidden_state = encoder_outputs.last_hidden_state
-        cls_token = last_hidden_state[:, 0, :] if last_hidden_state.dim() == 3 else last_hidden_state
+        # 设备管理
+        self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.to(self.device)
         
-        # 生成输出向量 - 命名为 outputs
-        outputs = self.vector_head(cls_token)  # <-- 直接返回张量而非字典
+        # 记录模型信息
+        self.log_model_info()
         
-        return outputs  # 返回名为 outputs 的向量！
+        # 加载预训练权重
+        if model_weights_path:
+            self._smart_load_weights(model_weights_path)
     
-    @classmethod
-    def load_pretrained(cls, config: Dict[str, Any]) -> 'TransformerModel':
-        """加载预训练权重"""
-        logger = logging.getLogger("training")
-        prediction_model_path = config['paths']['output_model']
-        model_params = config['model']['params']
+    def log_model_info(self):
+        """记录模型参数信息"""
+        total_params = sum(p.numel() for p in self.parameters())
+        trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        print(f"🔄 模型总参数量: {total_params:,}")
+        print(f"🔄 可训练参数量: {trainable_params:,}")
+        print(f"🔄 配置信息: {self.config}")
+    
+    def _smart_load_weights(self, weights_path: str):
+        """智能加载模型权重，处理层级命名差异"""
+        try:
+            # 加载原始状态字典
+            state_dict = torch.load(weights_path, map_location=self.device)
+            
+            print(f"🔄 原始权重包含 {len(state_dict)} 个参数")
+            
+            # 创建修正后的状态字典
+            new_state_dict = {}
+            for key, value in state_dict.items():
+                # 应用重命名规则
+                if key.startswith("layers."):
+                    # 1. 处理归一化层
+                    if "input_layernorm" in key:
+                        new_key = key.replace("input_layernorm", "layers.{}.input_layernorm")
+                    elif "post_attention_layernorm" in key:
+                        new_key = key.replace("post_attention_layernorm", "layers.{}.post_attention_layernorm")
+                    
+                    # 2. 处理注意力层
+                    elif "self_attn_q_proj" in key:
+                        new_key = key.replace("self_attn_q_proj", "layers.{}.self_attn_q_proj")
+                    elif "self_attn_k_proj" in key:
+                        new_key = key.replace("self_attn_k_proj", "layers.{}.self_attn_k_proj")
+                    elif "self_attn_v_proj" in key:
+                        new_key = key.replace("self_attn_v_proj", "layers.{}.self_attn_v_proj")
+                    elif "self_attn_o_proj" in key:
+                        new_key = key.replace("self_attn_o_proj", "layers.{}.self_attn_o_proj")
+                    
+                    # 3. 处理MLP层
+                    elif "mlp_gate_proj" in key:
+                        new_key = key.replace("mlp_gate_proj", "layers.{}.mlp_gate_proj")
+                    elif "mlp_up_proj" in key:
+                        new_key = key.replace("mlp_up_proj", "layers.{}.mlp_up_proj")
+                    elif "mlp_down_proj" in key:
+                        new_key = key.replace("mlp_down_proj", "layers.{}.mlp_down_proj")
+                    
+                    # 应用层级索引
+                    parts = key.split(".")
+                    layer_idx = parts[1]  # 从 "layers.0..." 获取索引
+                    new_key = new_key.format(layer_idx)
+                else:
+                    # 特殊处理非层级的键
+                    new_key = key
+                
+                new_state_dict[new_key] = value
+            
+            # 加载修正后的权重
+            result = self.load_state_dict(new_state_dict, strict=False)
+            missing_keys = result.missing_keys
+            unexpected_keys = result.unexpected_keys
+            
+            # 检查权重加载情况
+            print(f"✅ 权重加载完成 ({len(state_dict) - len(missing_keys)}/{len(state_dict)} 匹配)")
+            
+            # 打印详细报告
+            self.print_weight_report(state_dict, missing_keys, unexpected_keys)
+            
+        except Exception as e:
+            print(f"❌ 加载权重失败: {str(e)}")
+            raise
+    
+    def print_weight_report(self, state_dict, missing_keys, unexpected_keys):
+        """打印详细的权重加载报告"""
+        total = len(state_dict)
+        loaded = total - len(missing_keys)
+        missing_count = len(missing_keys)
+        unused_count = len(unexpected_keys)
         
-        # 创建模型实例
-        model = cls(
-            model_name=model_params['model_name'],
-            output_size=model_params.get('output_size')
-        )
-        model = model.to(device)
-        safety = SafetyModule()
-        safety = safety.to(device)
-        # 如果预训练模型存在，加载权重
-        if os.path.exists(prediction_model_path):
-            logger.info(f"⚙️ 加载预训练模型: {prediction_model_path}")
-            pretrained_dict = torch.load(prediction_model_path)
-            model.load_state_dict(pretrained_dict, strict=False)
-            logger.info(f"✅ 成功加载预训练模型权重")
+        print(f"\n{'='*60}")
+        print("权重加载诊断报告")
+        print(f"{'='*60}")
+        print(f"✓ 权重文件包含 {total} 个参数")
+        print(f"✓ 成功加载 {loaded} 个参数 ({loaded/total*100:.1f}%)")
+        print(f"⚠️ 缺失 {missing_count} 个参数")
+        print(f"⚠️ 未使用 {unused_count} 个参数")
+        
+        if missing_keys:
+            print("\n关键缺失参数:")
+            for i, key in enumerate(missing_keys[:10]):
+                print(f"  {i+1}. {key}")
+            if len(missing_keys) > 10:
+                print(f"  ... 及 {len(missing_keys)-10} 个更多")
+        
+        if unexpected_keys:
+            print("\n未使用的权重参数:")
+            for i, key in enumerate(unexpected_keys[:10]):
+                print(f"  {i+1}. {key}")
+            if len(unexpected_keys) > 10:
+                print(f"  ... 及 {len(unexpected_keys)-10} 个更多")
+        
+        print(f"{'='*60}\n")
+    
+    def forward(
+        self, 
+        input_data: torch.Tensor,
+        position_ids: Optional[torch.Tensor] = None,
+        attention_mask: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        """
+        完整的前向传播实现
+        
+        参数:
+            input_data: 输入张量, 形状 [batch_size, seq_len]
+                        可以是整数Token(使用嵌入层)或浮点数(使用投影层)
+            position_ids: 位置ID张量, 形状 [batch_size, seq_len]
+            attention_mask: 注意力掩码, 形状 [batch_size, seq_len]
+            
+        返回:
+            torch.Tensor: 输出预测结果, 形状 [batch_size, output_size]
+        """
+        # === 1. 输入形状检查和处理 ===
+        # 确保输入是2D张量 [batch_size, seq_len]
+        if input_data.dim() != 2:
+            raise ValueError(f"输入张量必须是2D (batch_size, seq_len), 但是得到 {input_data.dim()}D")
+        
+        batch_size, seq_len = input_data.size()
+        
+        # === 2. 输入类型处理 ===
+        # 确定输入类型（整数Token或浮点数）
+        if input_data.dtype in [torch.int, torch.int8, torch.int16, torch.int32, torch.int64]:
+            # 整数输入：通过Token嵌入层
+            inputs_embeds = self.embed_tokens(input_data)
         else:
-            logger.warning(f"⚠️ 预训练模型未找到: {prediction_model_path}")
+            # 浮点数输入：通过投影层
+            # 添加一个特征维度 [batch_size, seq_len, 1] 然后投影到隐藏维度
+            inputs_embeds = self.input_projection(input_data.unsqueeze(-1))
         
-        return model
+        # === 3. 位置ID处理 ===
+        if position_ids is None:
+            # 创建默认位置ID: [0, 1, 2, ..., seq_len-1]
+            position_ids = torch.arange(
+                seq_len, 
+                dtype=torch.long, 
+                device=self.device
+            ).unsqueeze(0).expand(batch_size, seq_len)
+        
+        # === 4. 注意力掩码处理 ===
+        if attention_mask is None:
+            # 创建默认全1掩码
+            attention_mask = torch.ones(
+                (batch_size, seq_len),
+                device=self.device,
+                dtype=torch.long
+            )
+        
+        # 转换注意力掩码为浮点型并扩展维度
+        # 原始形状: [batch_size, seq_len]
+        # 扩展后: [batch_size, 1, 1, seq_len] (用于批处理和头维度)
+        attn_mask = attention_mask.to(dtype=inputs_embeds.dtype)
+        attn_mask = attn_mask.unsqueeze(1).unsqueeze(2)  # -> [batch_size, 1, 1, seq_len]
+        
+        # 应用负无穷值屏蔽需要关注的位置
+        # 创建因果掩码（防止位置查看未来位置）
+        causal_mask = torch.tril(
+            torch.ones((1, 1, seq_len, seq_len), device=self.device)
+        ).to(inputs_embeds.dtype)
+        
+        # 合并注意力掩码和因果掩码
+        combined_mask = attn_mask * causal_mask
+        
+        # 为屏蔽位置设置非常大的负值（用于softmax中的屏蔽）
+        # 其中 combined_mask == 0 的位置需要被屏蔽
+        neg_inf = -1e10
+        attn_mask = combined_mask * (1.0 - neg_inf) + (1.0 - combined_mask) * neg_inf
+        
+        # === 5. 通过Transformer层 ===
+        hidden_states = inputs_embeds
+        for layer in self.layers:
+            hidden_states = layer(
+                x=hidden_states,
+                rotary_emb=self.rotary_emb,  # 传递RotaryEmbedding实例
+                position_ids=position_ids,
+                attention_mask=attn_mask
+            )
+        
+        # === 6. 最终归一化 ===
+        hidden_states = self.norm(hidden_states)
+        
+        # === 7. 获取序列最后位置的表示 ===
+        # 方法1：使用注意力掩码确定实际有效位置
+        sequence_lengths = attention_mask.sum(dim=1) - 1  # 最后有效位置索引
+        sequence_lengths = sequence_lengths.clamp(min=0)  # 确保非负
+        
+        # 创建批处理索引
+        batch_indices = torch.arange(batch_size, device=self.device)
+        
+        # 提取每个序列的最后有效隐藏状态
+        last_hidden_states = hidden_states[batch_indices, sequence_lengths, :]
+        
+        # === 8. 输出预测 ===
+        logits = self.output(last_hidden_states)
+        
+        return logits
+    
+class RotaryEmbedding(nn.Module):
+    """旋转位置编码实现（保持不变）"""
+    def __init__(self, dim: int, max_seq_len: int = 2048):
+        super().__init__()
+        inv_freq = 1.0 / (10000 ** (torch.arange(0, dim, 2).float() / dim))
+        t = torch.arange(max_seq_len).type_as(inv_freq)
+        freqs = torch.outer(t, inv_freq)
+        emb = torch.cat((freqs, freqs), dim=-1)
+        self.register_buffer("cos_cached", emb.cos()[None, None, :, :])
+        self.register_buffer("sin_cached", emb.sin()[None, None, :, :])
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return apply_rotary_pos_emb(x, self.cos_cached, self.sin_cached)
+def apply_rotary_pos_emb(x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> torch.Tensor:
+    """应用旋转位置嵌入到输入张量"""
+    seq_len = x.size(-2)
+    cos = cos[:, :, :seq_len, :].to(x.device)
+    sin = sin[:, :, :seq_len, :].to(x.device)
+    x_rot = x[..., : x.shape[-1] // 2]
+    x_pass = x[..., x.shape[-1] // 2 :]
+    x_rot = (x_rot * cos) + (rotate_half(x_rot) * sin)
+    return torch.cat((x_rot, x_pass), dim=-1)
 
+def rotate_half(x: torch.Tensor) -> torch.Tensor:
+    """将输入张量的后一半旋转"""
+    x1, x2 = x.chunk(2, dim=-1)
+    return torch.cat((-x2, x1), dim=-1)
+class DeepSeekCompatibleTransformerBlock(nn.Module):
+    def __init__(self, d_model, n_head, num_kv_heads, head_dim, dim_feedforward, dropout):
+        super().__init__()
+        # 关键：使用统一维度定义
+        self.self_attn = DeepseekAttention(
+            embed_dim=d_model,
+            num_heads=n_head,
+            num_kv_heads=num_kv_heads,
+            head_dim=head_dim,
+            rope_theta=10000.0
+        )
+        
+        # MLP使用dim_feedforward=8960
+        self.mlp = SwishGLU(
+            input_size=d_model,
+            hidden_size=dim_feedforward  # 设为8960
+        )
+        
+        self.input_norm = DeepseekRMSNorm(d_model, eps=1e-5)
+        self.output_norm = DeepseekRMSNorm(d_model, eps=1e-5)
+        
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        # Pre-LN结构
+        # 第一个归一化
+        x_normalized = self.input_norm(x)
+        
+        # 自注意力
+        attn_output = self.self_attn(x_normalized)
+        attn_output = self.dropout(attn_output)
+        x = x + attn_output  # 残差连接
+        
+        # MLP前的第二个归一化
+        x_normalized = self.output_norm(x)
+        
+        # 前馈网络
+        mlp_output = self.mlp(x_normalized)
+        mlp_output = self.dropout(mlp_output)
+        return x + mlp_output  # 残差连接
+class DeepseekRMSNorm(nn.Module):
+    """Deepseek使用的RMSNorm（保持不变）"""
+    def __init__(self, hidden_size: int, eps: float = 1e-6):
+        super().__init__()
+        self.weight = nn.Parameter(torch.ones(hidden_size))
+        self.eps = eps
+    
+    def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
+        input_dtype = hidden_states.dtype
+        variance = hidden_states.to(torch.float32).pow(2).mean(-1, keepdim=True)
+        hidden_states = hidden_states * torch.rsqrt(variance + self.eps)
+        return self.weight * hidden_states.to(input_dtype)
+class SwishGLU(nn.Module):
+    def __init__(self, input_size, hidden_size):
+        super().__init__()
+        # 关键：修正维度为8960
+        self.gate_proj = nn.Linear(input_size, hidden_size, bias=False)
+        self.up_proj = nn.Linear(input_size, hidden_size, bias=False)
+        self.down_proj = nn.Linear(hidden_size, input_size, bias=False)
+        self.act = nn.SiLU()
+        
+    def forward(self, x):
+        # SwishGLU激活
+        gate = self.act(self.gate_proj(x))
+        up = self.up_proj(x)
+        return self.down_proj(gate * up)
+class DeepseekAttention(nn.Module):
+    """Deepseek 1.5B 的自注意力模块 (分组查询注意力)"""
+    def __init__(self, hidden_size, num_heads, num_kv_heads=None):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.num_heads = num_heads
+        
+        # 处理分组查询注意力
+        self.num_kv_heads = num_heads if num_kv_heads is None else num_kv_heads
+        self.num_kv_repeats = num_heads // self.num_kv_heads
+        
+        # 确保隐藏大小可被头数整除
+        if hidden_size % num_heads != 0:
+            raise ValueError(f"hidden_size ({hidden_size}) 必须能被 num_heads ({num_heads}) 整除")
+        
+        self.head_dim = hidden_size // num_heads
+        
+        # 线性投影层
+        self.q_proj = nn.Linear(hidden_size, num_heads * self.head_dim, bias=False)
+        self.k_proj = nn.Linear(hidden_size, self.num_kv_heads * self.head_dim, bias=False)
+        self.v_proj = nn.Linear(hidden_size, self.num_kv_heads * self.head_dim, bias=False)
+        self.o_proj = nn.Linear(hidden_size, hidden_size, bias=False)
+        
+        # 用于注意力掩码的常量
+        self.register_buffer("mask_bias", torch.tril(torch.ones(1024, 1024)))
+    
+    def group_kv_repeat(self, kv):
+        """为分组查询注意力重复键值对"""
+        return (
+            kv[0].repeat_interleave(self.num_kv_repeats, dim=2),
+            kv[1].repeat_interleave(self.num_kv_repeats, dim=2)
+        )
+    
+    def forward(
+        self, 
+        x: torch.Tensor,
+        rotary_emb: RotaryEmbedding,
+        position_ids: torch.Tensor,
+        attention_mask: torch.Tensor = None
+    ) -> torch.Tensor:
+        batch_size, seq_len, _ = x.shape
+        
+        # 投影查询、键和值
+        q = self.q_proj(x)
+        k = self.k_proj(x)
+        v = self.v_proj(x)
+        
+        # 分割多头
+        q = q.view(batch_size, seq_len, self.num_heads, self.head_dim)
+        k = k.view(batch_size, seq_len, self.num_kv_heads, self.head_dim)
+        v = v.view(batch_size, seq_len, self.num_kv_heads, self.head_dim)
+        
+        # 应用旋转位置编码
+        q = rotary_emb(q, position_ids)
+        k = rotary_emb(k, position_ids)
+        
+        # 处理分组查询注意力 (重复键值对)
+        if self.num_kv_repeats > 1:
+            k, v = self.group_kv_repeat((k, v))
+        
+        # 转置以便矩阵乘法 (批量大小, 头数, 序列长度, 头维度)
+        q = q.transpose(1, 2)
+        k = k.transpose(1, 2)
+        v = v.transpose(1, 2)
+        
+        # 计算注意力分数
+        attn_scores = torch.matmul(q, k.transpose(-2, -1)) / math.sqrt(self.head_dim)
+        
+        # 应用注意力掩码 (因果掩码或自定义掩码)
+        if attention_mask is not None:
+            attn_scores = attn_scores + attention_mask.unsqueeze(1)
+        else:
+            # 应用因果掩码
+            causal_mask = self.mask_bias[:seq_len, :seq_len].view(1, 1, seq_len, seq_len)
+            attn_scores = torch.where(
+                causal_mask > 0, 
+                attn_scores, 
+                torch.tensor(-1e9, dtype=attn_scores.dtype, device=attn_scores.device)
+            )
+        
+        # Softmax 归一化
+        attn_probs = F.softmax(attn_scores, dim=-1)
+        
+        # 注意力输出
+        attn_output = torch.matmul(attn_probs, v)
+        attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, seq_len, -1)
+        
+        # 最终投影
+        return self.o_proj(attn_output)
+
+class DeepseekMLP(nn.Module):
+    """Deepseek 1.5B 的MLP模块 (SwiGLU激活)"""
+    def __init__(self, hidden_size, mlp_size):
+        super().__init__()
+        self.gate_proj = nn.Linear(hidden_size, mlp_size, bias=False)
+        self.up_proj = nn.Linear(hidden_size, mlp_size, bias=False)
+        self.down_proj = nn.Linear(mlp_size, hidden_size, bias=False)
+        
+    def forward(self, x):
+        """前向传播使用SwiGLU激活"""
+        gate = F.silu(self.gate_proj(x))
+        up = self.up_proj(x)
+        return self.down_proj(gate * up)
+class DeepseekBlock(nn.Module):
+    """完全匹配预训练权重命名的Transformer块"""
+    def __init__(
+        self,
+        hidden_size: int,
+        num_heads: int,
+        num_kv_heads: int,
+        mlp_size: int,
+        dropout: float = 0.1
+    ):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.num_heads = num_heads
+        self.num_kv_heads = num_kv_heads
+        self.head_dim = hidden_size // num_heads
+        
+        # 检查头数和头维度是否有效
+        assert hidden_size % num_heads == 0, "hidden_size必须能被num_heads整除"
+        assert self.head_dim * num_heads == hidden_size, "头维度计算错误"
+        assert num_kv_heads > 0 and num_kv_heads <= num_heads, "num_kv_heads必须在1和num_heads之间"
+        
+        # 1. 输入归一化 - 匹配预训练权重命名: input_layernorm
+        self.input_layernorm = DeepseekRMSNorm(hidden_size)
+        
+        # 2. 注意力机制 - 完全匹配预训练权重命名
+        self.self_attn_q_proj = nn.Linear(hidden_size, hidden_size, bias=True)
+        self.self_attn_k_proj = nn.Linear(
+            hidden_size, 
+            num_kv_heads * self.head_dim,
+            bias=True
+        )
+        self.self_attn_v_proj = nn.Linear(
+            hidden_size, 
+            num_kv_heads * self.head_dim,
+            bias=True
+        )
+        self.self_attn_o_proj = nn.Linear(hidden_size, hidden_size, bias=False)
+        
+        # 3. MLP输入归一化 - 匹配预训练权重命名: post_attention_layernorm
+        self.post_attention_layernorm = DeepseekRMSNorm(hidden_size)
+        
+        # 4. MLP网络 - 匹配预训练权重命名
+        self.mlp_gate_proj = nn.Linear(hidden_size, mlp_size, bias=False)
+        self.mlp_up_proj = nn.Linear(hidden_size, mlp_size, bias=False)
+        self.mlp_down_proj = nn.Linear(mlp_size, hidden_size, bias=False)
+        
+        # 5. 注意力缩放因子
+        self.scale_factor = 1.0 / math.sqrt(self.head_dim)
+        
+        # 6. 注意力丢弃
+        self.attn_dropout = nn.Dropout(dropout)
+    
+    def forward(
+        self, 
+        x: torch.Tensor, 
+        rotary_emb: RotaryEmbedding,
+        position_ids: torch.Tensor,
+        attention_mask: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
+        # 保存残差连接
+        residual = x
+        
+        # === 1. 注意力归一化 ===
+        x = self.input_layernorm(x)
+        
+        # === 2. 多头注意力机制 ===
+        # 计算查询、键、值投影
+        q = self.self_attn_q_proj(x)  # [batch, seq_len, hidden_size]
+        k = self.self_attn_k_proj(x)  # [batch, seq_len, num_kv_heads * head_dim]
+        v = self.self_attn_v_proj(x)  # [batch, seq_len, num_kv_heads * head_dim]
+        
+        # 重塑查询张量 [batch, seq_len, num_heads, head_dim]
+        q = q.view(q.size(0), q.size(1), self.num_heads, self.head_dim)
+        
+        # 重塑键张量 [batch, seq_len, num_kv_heads, head_dim]
+        k = k.view(k.size(0), k.size(1), self.num_kv_heads, self.head_dim)
+        
+        # 重塑值张量 [batch, seq_len, num_kv_heads, head_dim]
+        v = v.view(v.size(0), v.size(1), self.num_kv_heads, self.head_dim)
+        
+        # === 3. 应用旋转位置编码 ===
+        q = rotary_emb(q)
+        k = rotary_emb(k)
+        
+        # 关键修复：处理查询头和键值头不匹配问题
+        if self.num_kv_heads != self.num_heads:
+            # 计算重复因子
+            repeat_factor = self.num_heads // self.num_kv_heads
+            
+            # 重复键值头以匹配查询头数
+            k = k.repeat_interleave(repeat_factor, dim=2)  # [batch, seq_len, num_heads, head_dim]
+            v = v.repeat_interleave(repeat_factor, dim=2)  # [batch, seq_len, num_heads, head_dim]
+        
+        # === 4. 重塑张量用于注意力计算 ===
+        # 转置张量维度 [batch, heads, seq_len, head_dim]
+        q = q.transpose(1, 2)
+        k = k.transpose(1, 2)
+        v = v.transpose(1, 2)
+        
+        # === 5. 计算注意力分数 ===
+        # 点积注意力: Q @ K^T
+        attn_scores = torch.matmul(q, k.transpose(-1, -2)) * self.scale_factor
+        
+        # 应用注意力掩码
+        if attention_mask is not None:
+            if attention_mask.dim() == 2:
+                attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
+            elif attention_mask.dim() == 3:
+                attention_mask = attention_mask.unsqueeze(1)
+            
+            # 应用掩码：将屏蔽位置设为大负数
+            attn_scores = attn_scores.masked_fill(attention_mask == 0, -1e10)
+        
+        # 计算注意力概率
+        attn_probs = torch.softmax(attn_scores, dim=-1)
+        attn_probs = self.attn_dropout(attn_probs)
+        
+        # === 6. 应用注意力权重 ===
+        attn_output = torch.matmul(attn_probs, v)
+        
+        # === 7. 重塑注意力输出 ===
+        attn_output = attn_output.transpose(1, 2)
+        attn_output = attn_output.contiguous().view(
+            attn_output.size(0), 
+            attn_output.size(1), 
+            self.hidden_size
+        )
+        
+        # === 8. 注意力输出投影 ===
+        attn_output = self.self_attn_o_proj(attn_output)
+        
+        # === 9. 添加残差连接 ===
+        x = residual + attn_output
+        
+        # === 10. MLP部分 ===
+        residual = x
+        x = self.post_attention_layernorm(x)
+        
+        # MLP层计算 (SwiGLU激活)
+        gate = torch.sigmoid(self.mlp_gate_proj(x))
+        up = self.mlp_up_proj(x)
+        mlp_output = self.mlp_down_proj(gate * up)
+        
+        # 残差连接
+        x = residual + mlp_output
+        
+        return x
+class DeepseekLayer(nn.Module):
+    """Deepseek Transformer模块的完整实现"""
+    def __init__(self, hidden_size, num_heads, num_kv_heads, hidden_size_mlp):
+        super().__init__()
+        
+        # 注意力层
+        self.input_norm = DeepseekRMSNorm(hidden_size)
+        self.q_proj = nn.Linear(hidden_size, hidden_size, bias=False)
+        self.k_proj = nn.Linear(hidden_size, hidden_size, bias=False)
+        self.v_proj = nn.Linear(hidden_size, hidden_size, bias=False)
+        self.o_proj = nn.Linear(hidden_size, hidden_size, bias=False)
+        
+        # 旋转位置编码
+        self.rotary_emb = RotaryEmbedding(hidden_size // num_heads)
+        
+        # MLP层
+        self.output_norm = DeepseekRMSNorm(hidden_size)
+        self.gate_proj = nn.Linear(hidden_size, hidden_size_mlp, bias=False)
+        self.up_proj = nn.Linear(hidden_size, hidden_size_mlp, bias=False)
+        self.down_proj = nn.Linear(hidden_size_mlp, hidden_size, bias=False)
+        
+        self.hidden_size = hidden_size
+        self.num_heads = num_heads
+        self.head_dim = hidden_size // num_heads
+        self.num_kv_heads = num_kv_heads
+        self.kv_dim = self.head_dim * num_kv_heads
+        
+        # 确保参数设置有效
+        if hidden_size % num_heads != 0:
+            raise ValueError(
+                f"hidden_size ({hidden_size}) 必须能被 num_heads ({num_heads}) 整除"
+            )
+
+    def forward(self, x, attention_mask=None, position_ids=None):
+        # 输入归一化
+        residual = x
+        x = self.input_norm(x)
+        
+        # 自注意力机制
+        batch_size, seq_len, _ = x.size()
+        
+        # 投影查询、键和值
+        q = self.q_proj(x)
+        k = self.k_proj(x)
+        v = self.v_proj(x)
+        
+        # 分割多头
+        q = q.view(batch_size, seq_len, self.num_heads, self.head_dim)
+        k = k.view(batch_size, seq_len, self.num_kv_heads, self.head_dim)
+        v = v.view(batch_size, seq_len, self.num_kv_heads, self.head_dim)
+        
+        # 应用旋转位置编码
+        q = self.rotary_emb(q, position_ids)
+        k = self.rotary_emb(k, position_ids)
+        
+        # 计算注意力分数
+        attn_scores = torch.einsum("bqhd,bkhd->bhqk", q, k) / (self.head_dim ** 0.5)
+        
+        # 应用注意力掩码
+        if attention_mask is not None:
+            attn_scores = attn_scores + attention_mask.unsqueeze(1)
+        
+        # Softmax 归一化
+        attn_probs = torch.softmax(attn_scores, dim=-1)
+        
+        # 计算注意力输出
+        attn_output = torch.einsum("bhqk,bkhd->bqhd", attn_probs, v)
+        attn_output = attn_output.contiguous().view(batch_size, seq_len, -1)
+        
+        # 最终投影
+        attn_output = self.o_proj(attn_output)
+        
+        # 残差连接
+        x = residual + attn_output
+        
+        # MLP部分
+        residual = x
+        x = self.output_norm(x)
+        
+        # MLP层计算
+        gate = torch.sigmoid(self.gate_proj(x))
+        up = self.up_proj(x)
+        mlp_output = self.down_proj(gate * up)
+        
+        # 残差连接
+        x = residual + mlp_output
+        
+        return x
 def compute_reward(model2_result, targets,lookback=5):
     """模拟实际交易效果的奖励"""
     # 获取模型预测序列
@@ -933,66 +1704,6 @@ def get_actual_price(stock_code, date):
         return None
     return float(row['close'].values[0])
 
-def get_data_files_from_dir(dir_path: str) -> Dict[str, str]:
-    """安全地从目录识别CSV数据文件（特征/X，标签/Y和日期/dates文件）"""
-    path_obj = Path(dir_path)
-    if not path_obj.exists() or not path_obj.is_dir():
-        raise FileNotFoundError(f"目录不存在或不是文件夹: {dir_path}")
-    
-    # 1. 查找所有CSV文件
-    csv_files = list(path_obj.glob('*.csv'))
-    if not csv_files:
-        raise FileNotFoundError(f"目录中未找到CSV文件: {dir_path}")
-    
-    # 2. 分类文件
-    result = {'train': [], 'val': [], 'test': []}
-    
-    # 优先级1: 按标准命名模式
-    for file in csv_files:
-        fname = file.stem.lower()
-        
-        # 匹配训练集文件
-        if re.search(r'(train|training|train_data|training_data|train_set)', fname):
-            result['train'].append(str(file))
-        
-        # 匹配验证集文件
-        elif re.search(r'(val|validation|valid|valid_data|val_data)', fname):
-            result['val'].append(str(file))
-        
-        # 匹配测试集文件
-        elif re.search(r'(test|testing|test_data|testing_data|test_set)', fname):
-            result['test'].append(str(file))
-    
-    # 优先级2: 按数据集目录结构
-    if not any(result.values()):
-        for file in csv_files:
-            parent_dir = file.parent.stem.lower()
-            
-            if 'train' in parent_dir:
-                result['train'].append(str(file))
-            elif 'val' in parent_dir or 'valid' in parent_dir:
-                result['val'].append(str(file))
-            elif 'test' in parent_dir:
-                result['test'].append(str(file))
-    
-    # 优先级3: 按简单命名
-    if not any(result.values()):
-        for file in csv_files:
-            fname = file.stem.lower()
-            
-            if fname == 'data' or fname == 'dataset' or fname == 'full':
-                # 如果只有一个数据文件，则用于所有集
-                result['train'].append(str(file))
-                result['val'].append(str(file))
-                result['test'].append(str(file))
-                break
-    
-    # 4. 验证结果
-    if not result['train']:
-        raise FileNotFoundError(f"未找到训练数据集文件: {dir_path}")
-    
-    return result
-
 def main(config_path: str):
     """主函数"""
     # 加载配置
@@ -1019,119 +1730,130 @@ def main(config_path: str):
     logger.info("📁 所有输出目录已创建")
     
     # 获取训练和测试数据路径
-    train_dir = config['env'].get('train_data_path')
-    val_dir = config['env'].get('val_data_path', None)  
-    test_dir = config['env'].get('test_data_path')
+    train_dir = config['paths'].get('train_data_path')
+    val_dir = config['paths'].get('val_data_path', None)  
+    test_dir = config['paths'].get('test_data_path')
     
     if not train_dir or not os.path.exists(train_dir):
         raise RuntimeError(f"训练数据目录不存在或未定义：{train_dir}")
     if not test_dir or not os.path.exists(test_dir):
         raise RuntimeError(f"测试数据目录不存在或未定义：{test_dir}")
     
-    # 获取标签列和日期列名
-    label_col = config['data'].get('label_col', 'label')
-    date_col = config['data'].get('date_col', 'date')
     seq_length = config['training'].get('sequence_length', 30)
+
+    logger.info(f"📊 数据配置: 序列长度={seq_length}")
     
-    logger.info(f"📊 数据配置: 标签列='{label_col}', 日期列='{date_col}', 序列长度={seq_length}")
-    
-    # 获取数据集文件
-    train_files = get_data_files_from_dir(train_dir)
-    logger.info(f"训练数据集文件: train={train_files['train']}, val={train_files['val']}, test={train_files['test']}")
-    
-    # 如果有单独的验证目录
-    val_files = get_data_files_from_dir(val_dir) if val_dir else {'train': [], 'val': [], 'test': []}
     # 创建训练数据集
-    train_datasets = []
-    for path in train_files['train']:
-        logger.info(f"🔍 加载训练数据集: {path}")
-        ds = CSVDataset(
-            data_path=path,
-            label_col=label_col,
-            date_col=date_col,
-            sequence_length=seq_length
-        )
-        train_datasets.append(ds)
+    logger.info(f"🔍 加载训练数据集: {train_dir}")
+    train_dataset = CSVDataset(
+        data_path=train_dir,
+        sequence_length=seq_length
+    )
+    device = torch.device("cuda:0")
+    # 获取特征名称
+    feature_names = train_dataset.feature_names
+    logger.info(f"🔤 特征名称: {feature_names}")
+
+    # 打印数据集信息
+    train_dataset.get_data_report()
     
     # 处理验证数据集
-    val_datasets = []
-    for path in train_files['val'] + val_files['val']:  # 先使用训练目录中的验证集，再使用验证目录中的
-        if path:  # 确保路径有效
-            logger.info(f"🔍 加载验证数据集: {path}")
-            ds = CSVDataset(
-                data_path=path,
-                label_col=label_col,
-                date_col=date_col,
-                sequence_length=seq_length
-            )
-            val_datasets.append(ds)
-    
-    # 如果没有显式的验证集，尝试从训练集中划分
-    if not val_datasets and train_datasets:
-        logger.warning("⚠️ 未找到显式验证集，将从训练集中划分20%作为验证集")
-        total_size = len(train_datasets[0])
-        val_size = int(total_size * 0.2)
-        train_size = total_size - val_size
-        
-        # 分割第一个训练集作为验证集
-        train_ds, val_ds = torch.utils.data.random_split(
-            train_datasets[0], 
-            [train_size, val_size]
+    val_dataset = None
+    if val_dir and os.path.exists(val_dir):
+        logger.info(f"🔍 加载验证数据集: {val_dir}")
+        val_dataset = CSVDataset(
+            data_path=val_dir,
+            sequence_length=seq_length
         )
-        
-        # 替换原来的训练集列表
-        train_datasets = [train_ds] + train_datasets[1:]
-        val_datasets = [val_ds]
-    # 组合数据集
-    if len(train_datasets) > 1:
-        train_dataset = ConcatDataset(train_datasets)
-        logger.info(f"✅ 合并了 {len(train_datasets)} 个训练数据集")
+        val_dataset.get_data_report()
+    try:
+        hidden_size = config['env']['hidden_size']
+        num_layers = config['env']['num_layers']
+        num_heads = config['env']['num_heads']
+        model_path = config['env']['prediction_model_path']
+        sample, _, _ = train_dataset[0]
+        input_dim=sample.shape[-1]
+    except KeyError as e:
+        raise RuntimeError(f"配置缺少字段: {e}")
+    # 根据配置路径加载模型
+    safety = SafetyModule()
+    if model_path:
+        model2 = DeepSeekPredictor(device=device)
+        safety = safety.to(device)
+        print("加载的model2类型：", type(model2))
+        assert model2 is not None, "模型加载失败，model2为None！"
     else:
-        train_dataset = train_datasets[0] if train_datasets else None
-    
-    if len(val_datasets) > 1:
-        val_dataset = ConcatDataset(val_datasets)
-        logger.info(f"✅ 合并了 {len(val_datasets)} 个验证数据集")
-    else:
-        val_dataset = val_datasets[0] if val_datasets else None
-    
-    if not train_dataset:
-        raise RuntimeError("❌ 没有可用的训练数据!")
-    
+        print("未提供模型路径，无法加载模型。")    
     # 创建模型
-    if hasattr(train_dataset, 'get_sample'):
-        sample = train_dataset.get_sample(0)
-        input_dim = sample[0].shape[1] if isinstance(sample, tuple) else None
-    else:
-        # 如果dataset没有get_sample方法，尝试其他方法获取输入维度
-        try:
-            first_item = next(iter(train_dataset))
-            input_dim = first_item[0].shape[1]  # (batch, seq_len, features)
-        except:
-            raise RuntimeError("无法确定输入维度")
-    
-    logger.info(f"🧠 模型输入维度: {input_dim}")
+    try:
+        # 直接从训练数据集获取输入维度
+        sample, _, _ = train_dataset[0]
+        input_dim = sample.shape[-1]  # 特征维度在最后一位
+        logger.info(f"🧠 模型输入维度: {input_dim}")
+    except Exception as e:
+        logger.error(f"无法确定输入维度: {e}")
+        raise
     
     # 创建或加载模型
-    pretrained_path = config['paths'].get('pretrained_model')
+    pretrained_path = config['paths'].get('output_model')
     if pretrained_path and os.path.exists(pretrained_path):
         logger.info(f"⬇️ 加载预训练模型: {pretrained_path}")
-        model = TransformerModel.load_pretrained(config)
+        try:
+            model = TransformerModel(
+                tokenizer_path= "/home/liyakun/LLaMA-Factory-main/deepseek1.5B",       # ✔️ 新的分词器参数
+                model_weights_path=pretrained_path,   # ✔️ 新的权重路径参数
+                vocab_size=151936,  # 修正：Deepseek 1.5B的实际词汇表大小是51200，不是32000
+                hidden_size=1536,  # 使用正确的参数名（不是d_model或2048）
+                num_heads=24,      # 使用正确的参数名（不是n_head或16）
+                num_kv_heads=4,    # 关键：固定为4
+                hidden_size_mlp=8960, # 使用正确的参数名（不是dim_feedforward或8192）
+                num_layers=30,      # 1.5B模型的实际层数是30
+                output_size=1
+            ).to(device)
+            logger.info(f"✅ 预训练模型加载成功")
+            logger.info(f"🔄 模型架构:\n{model}")
+        except Exception as e:
+                logger.error(f"❌ 加载预训练模型失败: {str(e)}")
+                exit(1)
     else:
-        logger.info("🆕 创建新模型")
-        model = TransformerModel(
-            input_dim=input_dim,
-            output_dim=1,  # 单输出
-            config=config
-        )
-    
-    logger.info(f"🔄 模型架构:\n{model}")
-    
-    # 设置设备
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
-    logger.info(f"⚙️ 使用设备: {device}")
-    
+        logger.error("❌ 找不到模型路径或路径无效")
+
+    # 2. 加载预训练权重（关键步骤！）
+    weights_path = pretrained_path 
+    if os.path.exists(weights_path):
+        logger.info(f"⬇️ 加载预训练权重: {weights_path}")
+        try:
+            # 加载保存的状态字典
+            checkpoint = torch.load(weights_path, map_location=device)
+            
+            # 根据保存的方式处理
+            state_dict = {}
+            if isinstance(checkpoint, dict):
+                if 'model_state_dict' in checkpoint:
+                    state_dict = checkpoint['model_state_dict']
+                elif 'state_dict' in checkpoint:
+                    state_dict = checkpoint['state_dict']
+                else:
+                    state_dict = checkpoint
+            else:
+                state_dict = checkpoint
+                
+            # 处理不匹配的键名（常见解决方案）
+            new_state_dict = {}
+            for k, v in state_dict.items():
+                # 去掉可能的"module."前缀（多GPU训练保存的权重）
+                name = k.replace("module.", "")
+                new_state_dict[name] = v
+                
+            # 加载权重
+            model.load_state_dict(new_state_dict, strict=False)
+            logger.info("✅ 权重加载成功")
+        except Exception as e:
+            logger.error(f"❌ 权重加载失败: {str(e)}")
+            exit(1)
+    else:
+        logger.error(f"❌ 权重文件不存在: {weights_path}")
+        exit(1)
     # 创建数据加载器
     batch_size = config['training'].get('batch_size', 32)
     logger.info(f"📦 创建数据加载器 (batch_size={batch_size})")
@@ -1154,21 +1876,6 @@ def main(config_path: str):
         logger.info(f"✅ 训练集大小: {len(train_dataset)}, 验证集大小: {len(val_dataset)}")
     else:
         logger.warning("⚠️ 未创建验证数据加载器")
-     # 训练模型
-    logger.info("⏳ 开始训练...")
-    trained_model, stats = model(
-        model=model,
-        train_loader=train_loader,
-        val_loader=val_loader,
-        config=config,
-        device=device
-    )
-    logger.info("🏁 训练完成!")
-    
-    # 保存模型
-    model_save_path = Path(config['paths']['model_save_dir']) / "trained_model.pth"
-    torch.save(trained_model.state_dict(), model_save_path)
-    logger.info(f"💾 模型已保存到: {model_save_path}")
     
     # 准备优化器和损失函数
     optimizer = optim.Adam(
@@ -1231,7 +1938,7 @@ def main(config_path: str):
                     continue
                 if model2 is None:
                     raise RuntimeError("模型未正确加载，不能进行预测！")
-                model2_result = predict(model2, outputs)
+                model2_result = DeepSeekPredictor(model2, outputs)
                 print("模型二推理结果：", model2_result)
                 # 计算奖励（示例）
                 direction_match = (torch.sign(model2_result) == torch.sign(targets)).float()
@@ -1279,9 +1986,42 @@ def main(config_path: str):
             # 每10批次报告梯度状态
             if batch_idx % 10 == 0:
                 grad_monitor.report(batch_idx, epoch)
+        if val_loader:
+            val_loss = 0.0
+            model.eval()  # 切换为评估模式
+            with torch.no_grad():  # 禁用梯度计算
+                for val_inputs, val_targets, val_dates in val_loader:
+                    # 将数据转移到设备
+                    val_inputs = val_inputs.to(device)
+                    val_targets = val_targets.to(device)
+                    
+                    # 验证前向传播
+                    val_outputs = model(val_inputs)
+                    
+                    # 计算验证损失（仅基础监督损失）
+                    val_loss_dict = loss_fn(
+                        model_outputs={'logits': val_outputs},
+                        targets=val_targets,
+                        reward=None  # 验证时不使用奖励模型
+                    )
+                    
+                    # 累计验证损失
+                    val_loss += val_loss_dict["supervised_loss"].item()
+            
+            # 计算平均验证损失
+            avg_val_loss = val_loss / len(val_loader)
+            print(f"Epoch {epoch+1} 验证损失: {avg_val_loss:.4f}")
+            
+            # ===== 3. 模型保存决策 =====
+            if avg_val_loss < best_val_loss:
+                best_val_loss = avg_val_loss
+                model_save_path = Path(config['paths']['output_model'])
+                torch.save(model.state_dict(), model_save_path)
+                print(f"💾 保存最佳模型到: {model_save_path} (验证损失: {avg_val_loss:.4f})")
+            else:
+                print(f"当前验证损失 {avg_val_loss:.4f} 比最佳 {best_val_loss:.4f} 差，不保存模型")
         # 移除梯度监控钩子
         grad_monitor.detach()
-        
         # 报告当前epoch状态
         if valid_batch_count > 0:
             avg_loss = epoch_loss / valid_batch_count
@@ -1291,129 +2031,275 @@ def main(config_path: str):
             recovered_epoch = safety.recover(epoch)
             logger.warning(f"恢复至epoch {recovered_epoch}")
             epoch = recovered_epoch  # 重置epoch计数器
-        
-    
+
+    model_save_path = Path(config['paths']['output_model']) 
+    torch.save(model.state_dict(), model_save_path)
+    logger.info(f"💾 模型已保存到: {model_save_path}")
     # 测试和评估阶段
-    model.eval()
-    all_predictions = []
-    all_targets = []
-    all_dates = []
-    test_rewards = []
-    test_files = get_data_files_from_dir(test_dir)
-    # 创建测试数据集（可能包含多个测试文件）
-    test_datasets = []
-    for test_file in test_files['test']:
-        logger.info(f"加载测试数据集: {test_file}")
-        test_dataset = CSVDataset(
-            data_path=test_file,
-            label_col=label_col,
-            date_col=date_col,
-            sequence_length=config['training'].get('sequence_length', 30)
-        )
-        test_datasets.append(test_dataset)
-    
-    # 如果只有一个测试文件，直接使用；否则使用ConcatDataset
-    if len(test_datasets) == 1:
-        final_test_dataset = test_datasets[0]
+    logger.info("🧪 开始测试阶段...")
+
+    # 1. 数据加载和准备
+    if not test_dir or not test_dir.get('test'):
+        logger.info("⚠️ 没有配置测试数据集，跳过测试阶段")
     else:
-        final_test_dataset = torch.utils.data.ConcatDataset(test_datasets)
-    test_loader = DataLoader(
-        final_test_dataset, 
-        batch_size=config['training']['batch_size'], 
-        shuffle=False,
-        num_workers=4
-    )
-    with torch.no_grad():
-        for inputs, targets, dates in test_loader:
-            inputs, targets = inputs.to(device), targets.to(device)
-            outputs= model(inputs) 
-            all_predictions.extend(outputs.squeeze().cpu().numpy())
-            all_targets.extend(targets.cpu().numpy())
-            all_dates.extend(dates)
-            model2_preds = predict(model2, outputs)
-            direction_match = (torch.sign(model2_preds) == torch.sign(targets)).float()
-            accuracy_reward = direction_match * 0.8
-            error_reward = torch.exp(-2 * torch.abs(model2_preds- targets)) * 0.2
-            batch_reward = (accuracy_reward + error_reward).cpu().numpy()
-            test_rewards.extend(batch_reward)
-    # 转换为DataFrame便于保存结构化数据
-    results_df = pd.DataFrame({
-        'date': all_dates,  # 直接从加载器中获取的日期
-        'prediction': model2_preds,
-        'target': all_targets,
-        'error': np.abs(np.array(model2_preds) - np.array(all_targets))
-    })
-    
-    # 保存结构化输出数据到model1_output
-    output_path = save_structured_data(results_df, config, f"predictions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv")
-    logger.info(f"保存预测结果到: {output_path}")
-    # 计算评估指标
-    mae = np.mean(np.abs(np.array(all_predictions) - np.array(all_targets)))
-    rmse = np.sqrt(np.mean((np.array(all_predictions) - np.array(all_targets))**2))
-    sharpe_val = sharpe_ratio(np.array(all_predictions))
-    drawdown = max_drawdown(np.array(all_predictions))
-    if test_rewards:
-        avg_test_reward = sum(test_rewards) / len(test_rewards)
-        reward_std = np.std(test_rewards)  # 需要import numpy as np
-    else:
-        avg_test_reward = 0.0
-        reward_std = 0.0
-    eval_results = {
-        "MAE": mae,
-        "RMSE": rmse,
-        "Sharpe_Ratio": sharpe_val,
-        "Max_Drawdown": drawdown,
-        "num_samples": len(all_targets),
-        "input_features": train_dataset.feature_names,
-        "config_path": config_path,
-        "test_data_path": test_dir,
-        "model_summary": str(model),
-        "Avg_Reward": avg_test_reward,  # 新字段
-        "Reward_STD": reward_std,       # 新字段
-    }
-    eval_results_serializable = convert_to_serializable(eval_results) #计算评估指标
-    
-    output_path, _ = save_evaluation_results(eval_results, config, filename="evaluation_" + datetime.now().strftime('%Y%m%d_%H%M%S') + ".json")
-    with open(output_path, 'w') as f:
-        json.dump(eval_results_serializable, f, indent=4)
-    # 保存评估结果到model1_eval
-    save_evaluation_results(eval_results, config, f"evaluation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
-    
-    # 预测阶段（如果配置）
-    if 'predict' in config and config['predict'].get('steps', 0) > 0:
-        logger.info(f"🔮 开始预测, 步数: {config['predict']['steps']}")
+        # 安全加载测试数据集
+        test_datasets = []
+        for test_file in test_dir['test']:
+            logger.info(f"📥 加载测试数据集: {test_file}")
+            if not os.path.exists(test_file):
+                logger.warning(f"⚠️ 测试文件不存在，跳过: {test_file}")
+                continue
+                
+            try:
+                test_dataset = CSVDataset(
+                    data_path=test_file,
+                    sequence_length=config['training'].get('sequence_length', 30),
+                )
+                test_datasets.append(test_dataset)
+            except Exception as e:
+                logger.error(f"❌ 加载测试数据失败: {test_file}, 错误: {str(e)}")
+        
+        # 处理没有有效测试数据的情况
+        if not test_datasets:
+            logger.warning("⚠️ 没有可用的测试数据，跳过测试阶段")
+        else:
+            # 组合测试数据集
+            if len(test_datasets) > 1:
+                final_test_dataset = torch.utils.data.ConcatDataset(test_datasets)
+                logger.info(f"✅ 合并了 {len(test_datasets)} 个测试数据集，总样本数: {len(final_test_dataset)}")
+            else:
+                final_test_dataset = test_datasets[0]
+            
+            # 创建数据加载器
+            test_loader = DataLoader(
+                final_test_dataset, 
+                batch_size=config['training']['batch_size'], 
+                shuffle=False,
+                num_workers=4
+            )
+            
+            # 2. 测试过程
+            model.eval()
+            all_predictions = []
+            all_targets = []
+            all_dates = []
+            all_rewards = []
+            all_model2_preds = []  # 存储model2的预测结果
+            all_feature_sequences = []  # 存储输入特征序列
+            all_processed_features = []  # 存储处理后的特征
+            
+            with torch.no_grad():
+                for batch_idx, batch_data in enumerate(test_loader):
+                    # 解包数据 (根据CSVDataset的__getitem__方法)
+                    feature_sequences = batch_data[0]
+                    processed_features = batch_data[1]
+                    targets = batch_data[2]
+                    dates = batch_data[3]
+                    
+                    # 转移到设备
+                    processed_features = processed_features.to(device)
+                    targets = targets.to(device)
+                    
+                    # 模型预测 (使用处理后的特征)
+                    outputs = model(processed_features)
+                    model2_preds = DeepSeekPredictor(model2, outputs)  # 使用model2进行预测
+                    
+                    # 收集数据
+                    all_predictions.extend(outputs.squeeze().cpu().numpy())
+                    all_targets.extend(targets.cpu().numpy())
+                    all_dates.extend(dates)
+                    all_model2_preds.extend(model2_preds.cpu().numpy())
+                    
+                    # 收集特征数据用于分析
+                    all_feature_sequences.extend(feature_sequences.cpu().numpy())
+                    all_processed_features.extend(processed_features.cpu().numpy())
+                    
+                    # 计算奖励
+                    direction_match = (torch.sign(model2_preds) == torch.sign(targets)).float()
+                    accuracy_reward = direction_match * 0.8
+                    error_reward = torch.exp(-2 * torch.abs(model2_preds - targets)) * 0.2
+                    batch_reward = (accuracy_reward + error_reward).cpu().numpy()
+                    all_rewards.extend(batch_reward)
+                    
+                    # 每100批次报告一次进度
+                    if batch_idx % 100 == 0:
+                        logger.info(f"🔄 处理测试批次 {batch_idx+1}/{len(test_loader)}")
+            
+            # 3. 结果保存（结构化数据）
+            results_df = pd.DataFrame({
+                'date': all_dates,
+                'prediction': all_predictions,  # 主模型预测
+                'model2_prediction': all_model2_preds,  # model2的预测
+                'target': all_targets,
+                'error': np.abs(np.array(all_model2_preds) - np.array(all_targets)),
+                'reward': all_rewards
+            })
 
-        # 计算最大长度
-        len_dates = len(test_dataset.dates)
-        len_preds = len(all_predictions)
-        max_len = max(len_dates, len_preds, config['predict']['steps'])
+            # 添加特征数据到DataFrame
+            if all_feature_sequences:
+                # 特征序列通常是三维的 [batch, seq_len, features]
+                # 转换为numpy数组以便高效处理
+                feature_array = np.array(all_feature_sequences)
+                
+                # 获取特征数量
+                num_features = feature_array.shape[-1]
+                
+                # 直接使用特征索引命名列
+                for i in range(num_features):
+                    # 取序列中最后一个时间步的值作为当前特征值
+                    results_df[f'feature_{i}'] = feature_array[:, -1, i]
 
-        # 补齐dates
-        dates_padded = np.pad(test_dataset.dates, (0, max_len - len_dates), constant_values=np.nan)
-        # 补齐预测结果
-        preds_padded = np.pad(all_predictions, (0, max_len - len_preds), constant_values=np.nan)
-        # 生成 confidence 数组，长度为 max_len
-        confidence_array = np.random.uniform(0.7, 0.95, max_len)
+            # 保存预测结果
+            output_path = save_structured_data(
+                results_df, 
+                config, 
+                f"predictions_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            )
+            logger.info(f"💾 保存预测结果到: {output_path}")
 
-        # 只取前 max_len
-        dates_for_df = dates_padded[:max_len]
-        preds_for_df = preds_padded[:max_len]
+            # 4. 计算评估指标
+            try:
+                # 确保有足够的样本
+                num_samples = len(all_targets)
+                if num_samples < 10:
+                    raise ValueError(f"样本数量不足: {num_samples}, 无法进行可靠的评估")
+                
+                # 基本统计指标
+                mae = np.mean(np.abs(np.array(all_model2_preds) - np.array(all_targets)))
+                rmse = np.sqrt(mean_squared_error(all_targets, all_model2_preds))
+                
+                # 金融相关指标
+                sharpe_val = sharpe_ratio(np.array(all_model2_preds))
+                drawdown = max_drawdown(np.array(all_model2_preds))
+                
+                # 奖励统计
+                avg_test_reward = np.mean(all_rewards) if all_rewards else 0.0
+                reward_std = np.std(all_rewards) if all_rewards else 0.0
+                
+                # 方向准确率
+                predicted_signs = np.sign(np.array(all_model2_preds))
+                target_signs = np.sign(np.array(all_targets))
+                valid_idx = (predicted_signs != 0) & (target_signs != 0)  # 忽略零值
+                direction_accuracy = np.mean(predicted_signs[valid_idx] == target_signs[valid_idx]) if any(valid_idx) else np.nan
+                
+                # 特征相关性分析 (使用特征索引)
+                feature_correlations = {}
+                for i in range(num_features):
+                    col_name = f'feature_{i}'
+                    # 过滤无穷大和NaN值
+                    valid_idx = np.isfinite(results_df[col_name]) & np.isfinite(results_df['model2_prediction'])
+                    
+                    if np.sum(valid_idx) > 10:  # 确保有足够的数据点
+                        correlation = np.corrcoef(
+                            results_df.loc[valid_idx, col_name],
+                            results_df.loc[valid_idx, 'model2_prediction']
+                        )[0, 1]
+                        feature_correlations[col_name] = correlation
+                    else:
+                        feature_correlations[col_name] = np.nan
+                        logger.warning(f"无法计算特征'{col_name}'的相关性 - 有效数据点不足")
+                
+                # 组合评估结果
+                eval_results = {
+                    "MAE": mae,
+                    "RMSE": rmse,
+                    "Direction_Accuracy": direction_accuracy,
+                    "Sharpe_Ratio": sharpe_val,
+                    "Max_Drawdown": drawdown,
+                    "Avg_Reward": avg_test_reward,
+                    "Reward_STD": reward_std,
+                    "num_samples": num_samples,
+                    "config_path": config_path,
+                    "test_data_path": test_dir,
+                    "feature_correlations": feature_correlations,
+                    "test_start_date": min(all_dates) if all_dates else "N/A",
+                    "test_end_date": max(all_dates) if all_dates else "N/A"
+                }
+                
+                # 5. 保存评估结果
+                eval_results_serializable = convert_to_serializable(eval_results)
+                eval_dir = config['paths']['model1_eval'] if 'model1_eval' in config['paths'] else './eval_results'
+                output_path = os.path.join(
+                    eval_dir,
+                    f"evaluation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                )
+                os.makedirs(eval_dir, exist_ok=True)
+                with open(output_path, 'w') as f:
+                    json.dump(eval_results_serializable, f, indent=4)
+                logger.info(f"📝 保存评估结果到: {output_path}")
+                
+                # 6. 打印关键指标
+                logger.info("\n📊 测试结果摘要:")
+                logger.info(f"样本数量: {num_samples}")
+                if all_dates:
+                    logger.info(f"时间范围: {min(all_dates)} 至 {max(all_dates)}")
+                logger.info(f"平均绝对误差 (MAE): {mae:.6f}")
+                logger.info(f"均方根误差 (RMSE): {rmse:.6f}")
+                logger.info(f"方向准确率: {direction_accuracy*100 if not np.isnan(direction_accuracy) else 'N/A':.2f}%")
+                logger.info(f"平均奖励: {avg_test_reward:.4f} ± {reward_std:.4f}")
+                logger.info(f"夏普比率: {sharpe_val:.4f}")
+                logger.info(f"最大回撤: {drawdown*100:.2f}%")
+                
+                # 打印特征相关性摘要
+                if feature_correlations:
+                    logger.info("\n🔍 特征预测值相关性:")
+                    for feature, corr in feature_correlations.items():
+                        logger.info(f"{feature}: {corr:.4f}")
+                
+                # 保存特征映射信息
+                if test_datasets:
+                    try:
+                        # 获取特征映射
+                        feature_mapping = test_datasets[0].get_feature_mapping() if isinstance(test_datasets, list) else test_datasets.get_feature_mapping()
+                        
+                        # 保存特征映射文件
+                        mapping_path = output_path.replace('.json', '_feature_mapping.json')
+                        with open(mapping_path, 'w') as f:
+                            json.dump(feature_mapping, f, indent=4)
+                        logger.info(f"📋 保存特征映射到: {mapping_path}")
+                        
+                        # 同时记录在评估结果中
+                        eval_results['feature_mapping'] = feature_mapping
+                        with open(output_path, 'w') as f:  # 重新写入包含映射信息的结果
+                            json.dump(convert_to_serializable(eval_results), f, indent=4)
+                    except Exception as e:
+                        logger.warning(f"⚠️ 无法保存特征映射: {str(e)}")
+                
+            except ValueError as e:
+                logger.warning(f"⚠️ {str(e)} - 跳过部分评估指标")
+                # 创建最小错误报告
+                error_report = {
+                    "warning": str(e),
+                    "num_samples": len(all_targets),
+                    "test_files": test_dir['test'],
+                    "partial_results": eval_results if 'eval_results' in locals() else None
+                }
+                error_path = os.path.join(
+                    config['paths']['model1_eval'],
+                    f"partial_evaluation_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                )
+                with open(error_path, 'w') as f:
+                    json.dump(convert_to_serializable(error_report), f, indent=4)
+                logger.warning(f"⚠️ 保存部分评估结果到: {error_path}")
 
-        # 保存预测结果
-        predict_path = Path(config['predict']['output_path'])
-        predict_path.parent.mkdir(parents=True, exist_ok=True)
+            except Exception as e:
+                logger.error(f"❌ 评估指标计算失败: {str(e)}", exc_info=True)
+                # 创建最小化错误报告
+                error_report = {
+                    "error": str(e),
+                    "num_samples": len(all_targets) if 'all_targets' in locals() else 0,
+                    "test_files": test_dir['test']
+                }
+                error_path = os.path.join(
+                    config['paths']['model1_eval'],
+                    f"error_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                )
+                with open(error_path, 'w') as f:
+                    json.dump(convert_to_serializable(error_report), f, indent=4)
+                logger.error(f"💾 保存错误报告到: {error_path}")
 
-        # 构造 DataFrame
-        predict_df = pd.DataFrame({
-            'date': dates_for_df,
-            'prediction': preds_for_df,
-            'confidence': confidence_array
-        })
+            logger.info("✅ 测试阶段完成!")
 
-        predict_df.to_csv(predict_path, index=False)
-        logger.info(f"✅ 保存预测结果到: {predict_path}")
-
-    logger.info("🎉 训练和评估完成!")
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="RL交易系统训练脚本",

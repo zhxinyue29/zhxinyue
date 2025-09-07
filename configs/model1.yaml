@@ -1,11 +1,9 @@
 env:
   prediction_model_path: '/home/liyakun/twitter-stock-prediction/models/model2/best_model.pt'  # 模型2的路径，用于加载进行推理
-  train_data_path: '/home/liyakun/twitter-stock-prediction/data/splits/train/'  # 股票数据路径
-  test_data_path: '/home/liyakun/twitter-stock-prediction/data/splits/test/' 
   action_space_size: 773  # 动作空间大小
   hidden_size: 1536
-  num_layers: 28
-  num_heads: 12
+  num_layers: 30
+  num_heads: 24
   
   # 其他环境设置...
 
@@ -16,7 +14,11 @@ training:
   base_loss_weight: 0.6
   
   # 其他强化学习相关参数...
-
+# DeepSeek模型专用参数 (不能修改)
+deepseek:
+  head_dim: 64           # 1536 ÷ 24 = 64
+  kv_dim: 256            # 8 × 64 = 512
+  max_position_embeddings: 4096
 paths:
   # 训练/验证/测试数据集路径
   train_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv"
@@ -24,7 +26,7 @@ paths:
   test_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/test_dataset.csv"
   
   # 模型和输出路径
-  output_model: "results/models/model1.pt"
+  output_model: "/home/liyakun/twitter-stock-prediction/models/model1/best_model.pt"
   log_file: "logs/model1_training.log"
   processed_output_dir: "data/processed/model1_output"
   eval_output_dir: "results/model1_eval"
@@ -39,11 +41,13 @@ model:
   params:
     vocab_size: 151936  # 词汇表大小
     hidden_size: 1536   # 隐藏层维度
-    num_layers: 28     # Transformer层数
+    num_layers: 30     # Transformer层数
     action_space_size: 773
-    num_attention_heads: 8
-    intermediate_size: 5012
+    num_attention_heads: 24
+    num_key_value_heads: 8
+    intermediate_size: 8960
     input_dim: 773
+    model_name: 'transformer'
 
 stability:
   max_nan_allowed: 0       # 输入中允许的最大NaN值数量(0表示不允许任何NaN)
@@ -55,3 +59,9 @@ stability:
   backup_interval: 5       # 每5个epoch创建一个安全恢复点
   recovery_strategy: backoff # 恢复策略(backoff/reset)
   lr_backoff_factor: 0.5   # 学习率退避系数
+
+data:
+  label_col: sentiment  # 如果 sentiment 是你要预测/使用的目标，改成你需要的列名
+  date_col: timestamp   # 时间字段，用于排序或时序特征
+  text_col: text        # 文本字段名
+  id_col: symbol          # 可选，唯一标识列
