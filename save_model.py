@@ -11,7 +11,9 @@ tokenizer = AutoTokenizer.from_pretrained(model_directory)
 model = AutoModel.from_pretrained(model_directory, trust_remote_code=True)
 
 # 保存模型参数为 .pt 文件
-save_path = "/home/liyakun/twitter-stock-prediction/models/model1/best_model.pt"
-torch.save(model.state_dict(), save_path)
-
-print(f"模型参数已保存为 {save_path}")
+save_path1 = "/home/liyakun/twitter-stock-prediction/models/model1/best_model.pt"
+save_path2 = "/home/liyakun/twitter-stock-prediction/models/model2/best_model.pt"
+torch.save(model.state_dict(), save_path1)
+torch.save(model.state_dict(), save_path2)
+print(f"模型参数已保存为 {save_path1}")
+print(f"模型参数已保存为 {save_path2}")

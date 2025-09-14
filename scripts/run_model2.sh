@@ -14,4 +14,4 @@ export MODEL_NAME=model2
 
 # 运行训练脚本
 export PYTHONPATH="/home/liyakun/twitter-stock-prediction:$PYTHONPATH"
-python -m src/model2/train.py  
+python -m src.model2.train

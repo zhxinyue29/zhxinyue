@@ -10,7 +10,7 @@ env:
 training:
   learning_rate: 1e-5  # 学习率
   batch_size: 16
-  epochs: 50
+  epochs: 3 #实际训练改成50
   base_loss_weight: 0.6
   
   # 其他强化学习相关参数...
@@ -24,7 +24,7 @@ paths:
   train_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv"
   val_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv"
   test_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/test_dataset.csv"
-  
+  lora_output_dir: '/home/liyakun/twitter-stock-prediction/models/model1/lora'  
   # 模型和输出路径
   output_model: "/home/liyakun/twitter-stock-prediction/models/model1/best_model.pt"
   log_file: "logs/model1_training.log"

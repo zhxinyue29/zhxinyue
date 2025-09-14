@@ -3,18 +3,26 @@ data:
   model1_path: models/model1/best_model.pt
 training:
   batch_size: 16
-  epochs: 50
+  epochs: 3
   learning_rate: 1e-5
 paths:
   output_model: /home/liyakun/twitter-stock-prediction/models/model2/best_model.pt
   log_file: /home/liyakun/twitter-stock-prediction/logs/model2_train.log
+  # 训练/验证/测试数据集路径
+  train_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv"
+  val_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv"
+  test_data_path: "/home/liyakun/twitter-stock-prediction/data/processed/test_dataset.csv"
+  lora_output_dir: '/home/liyakun/twitter-stock-prediction/models/model1/lora'  
+  # 模型和输出路径
+  eval_output_dir: "results/model1_eval"
+  eval_output_path: 'results/model1_eval/evaluation_results.csv'
 env:
   prediction_model_path: /home/liyakun/twitter-stock-prediction/models/model2/best_model.pt
   tokenizer_dir: /home/liyakun/LLaMA-Factory-main/deepseek1.5B
 model:
   type: TransformerModel
   params:
-    input_dim: 773
+    input_dim: 1536
     hidden_size: 1536
     num_layers: 28
     num_attention_heads: 6
@@ -23,7 +31,7 @@ model:
     head_dim: 256
     vocab_size: 151936
     layer_norm_eps: 1e-5
-    use_bias: true
+    use_bias: false
     intermediate_size: 8960
     num_key_value_heads: 1
 deepseek:
