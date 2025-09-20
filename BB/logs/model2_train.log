@@ -1,0 +1,160 @@
+2025-09-16 12:49:53,544 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 12:49:53,544 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 12:49:53,544 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 12:49:53,544 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-16 12:49:53,544 - model2_train - INFO - 🧭 模型目录（读取结构）: /home/liyakun/twitter-stock-prediction/models/model2
+2025-09-16 12:49:53,544 - model2_train - INFO - 🧩 特征抽取: 优先 src.model1.predict.infer_embeddings；回退 HF @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 12:49:53,544 - model2_train - INFO - 📝 模型一配置(文本生成)路径: /home/liyakun/twitter-stock-prediction/configs/model1.yaml
+2025-09-16 12:49:53,561 - model2_train - INFO - ⚙️ 设备: cuda
+2025-09-16 12:49:53,732 - model2_train - WARNING - ⚠️ Debug 模式：仅使用前 100 条训练样本
+2025-09-16 12:49:53,732 - model2_train - INFO - 🧩 抽特征：回退 HuggingFace @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 12:51:06,537 - model2_train - INFO - 🧷 训练特征维度: 1536
+2025-09-16 12:56:16,240 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 12:56:16,241 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 12:56:16,241 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 12:56:16,241 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-16 13:04:25,708 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 13:04:25,708 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 13:04:25,708 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 13:04:25,708 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-16 13:04:25,708 - model2_train - INFO - 🧭 模型目录（读取结构）: models/model2
+2025-09-16 13:04:25,708 - model2_train - INFO - 🧩 特征抽取: 优先 src.model1.predict.infer_embeddings；回退 HF @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:04:25,708 - model2_train - INFO - 📝 模型一配置(文本生成)路径: /home/liyakun/twitter-stock-prediction/configs/model1.yaml
+2025-09-16 13:04:25,726 - model2_train - INFO - ⚙️ 设备: cuda
+2025-09-16 13:04:25,813 - model2_train - WARNING - ⚠️ Debug 模式：仅使用前 100 条训练样本
+2025-09-16 13:04:25,813 - model2_train - INFO - 🧩 抽特征：回退 HuggingFace @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:04:32,418 - model2_train - INFO - 🧷 训练特征维度: 1536
+2025-09-16 13:05:34,104 - model2_train - INFO - 🧠 使用 HF 模型: Qwen2ForCausalLM
+2025-09-16 13:05:34,231 - model2_train - INFO - 🧱 训练策略：冻结 HF 主体，仅训练线性回归头
+2025-09-16 13:05:34,383 - model2_train - INFO - [y 统计] mean=120.4734, std=212.0081, min=16.1000, max=1145.4399, n=100
+2025-09-16 13:05:34,384 - model2_train - INFO - 
+【训练】开始第 1 轮
+2025-09-16 13:05:58,491 - model2_train - INFO - ✅ Epoch 1 完成 | 训练损失: 118.494225 | 用时 24.1s
+2025-09-16 13:42:26,423 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 13:42:26,423 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 13:42:26,423 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 13:42:26,423 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-16 13:42:26,423 - model2_train - INFO - 🧭 模型目录（读取结构）: models/model2
+2025-09-16 13:42:26,423 - model2_train - INFO - 🧩 特征抽取: 优先 src.model1.predict.infer_embeddings；回退 HF @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:42:26,423 - model2_train - INFO - 📝 模型一配置(文本生成)路径: /home/liyakun/twitter-stock-prediction/configs/model1.yaml
+2025-09-16 13:42:26,441 - model2_train - INFO - ⚙️ 设备: cuda
+2025-09-16 13:42:26,528 - model2_train - WARNING - ⚠️ Debug 模式：仅使用前 100 条训练样本
+2025-09-16 13:42:26,528 - model2_train - INFO - 🧩 抽特征：回退 HuggingFace @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:42:33,491 - model2_train - INFO - 🧷 训练特征维度: 1536
+2025-09-16 13:42:36,086 - model2_train - INFO - 🧠 使用 HF 模型: Qwen2ForCausalLM
+2025-09-16 13:42:36,087 - model2_train - INFO - 🧱 训练策略：冻结 HF 主体，仅训练线性回归头
+2025-09-16 13:42:36,089 - model2_train - INFO - [y 统计] mean=120.4734, std=212.0081, min=16.1000, max=1145.4399, n=100
+2025-09-16 13:42:36,089 - model2_train - INFO - 
+【训练】开始第 1 轮
+2025-09-16 13:42:46,228 - model2_train - INFO - ✅ Epoch 1 完成 | 训练损失: 119.973351 | 用时 10.1s
+2025-09-16 13:45:48,481 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 13:45:48,481 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 13:45:48,481 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 13:45:48,481 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-16 13:45:48,482 - model2_train - INFO - 🧭 模型目录（读取结构）: models/model2
+2025-09-16 13:45:48,482 - model2_train - INFO - 🧩 特征抽取: 优先 src.model1.predict.infer_embeddings；回退 HF @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:45:48,482 - model2_train - INFO - 📝 模型一配置(文本生成)路径: /home/liyakun/twitter-stock-prediction/configs/model1.yaml
+2025-09-16 13:45:48,501 - model2_train - INFO - ⚙️ 设备: cuda
+2025-09-16 13:45:48,587 - model2_train - WARNING - ⚠️ Debug 模式：仅使用前 100 条训练样本
+2025-09-16 13:45:48,587 - model2_train - INFO - 🧩 抽特征：回退 HuggingFace @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:45:55,422 - model2_train - INFO - 🧷 训练特征维度: 1536
+2025-09-16 13:45:58,016 - model2_train - INFO - 🧠 使用 HF 模型: Qwen2ForCausalLM
+2025-09-16 13:45:58,017 - model2_train - INFO - 🧱 训练策略：冻结 HF 主体，仅训练线性回归头
+2025-09-16 13:45:58,018 - model2_train - INFO - [y 统计] mean=120.4734, std=212.0081, min=16.1000, max=1145.4399, n=100
+2025-09-16 13:45:58,019 - model2_train - INFO - 
+【训练】开始第 1 轮
+2025-09-16 13:46:08,270 - model2_train - INFO - ✅ Epoch 1 完成 | 训练损失: 119.973353 | 用时 10.3s
+2025-09-16 13:46:10,890 - model2_train - INFO - [Val] batch 5 | partial_loss=96.861252 | seen=80
+2025-09-16 13:46:13,453 - model2_train - INFO - [Val] batch 10 | partial_loss=89.612495 | seen=160
+2025-09-16 13:46:15,894 - model2_train - INFO - [Val] batch 15 | partial_loss=133.600616 | seen=240
+2025-09-16 13:46:18,459 - model2_train - INFO - [Val] batch 20 | partial_loss=186.042496 | seen=320
+2025-09-16 13:46:21,006 - model2_train - INFO - [Val] batch 25 | partial_loss=188.958130 | seen=400
+2025-09-16 13:46:23,596 - model2_train - INFO - [Val] batch 30 | partial_loss=96.043747 | seen=480
+2025-09-16 13:46:26,224 - model2_train - INFO - [Val] batch 35 | partial_loss=87.824997 | seen=560
+2025-09-16 13:46:28,846 - model2_train - INFO - [Val] batch 40 | partial_loss=82.286873 | seen=640
+2025-09-16 13:46:31,412 - model2_train - INFO - [Val] batch 45 | partial_loss=93.146873 | seen=720
+2025-09-16 13:46:34,125 - model2_train - INFO - [Val] batch 50 | partial_loss=114.960312 | seen=800
+2025-09-16 13:46:36,673 - model2_train - INFO - [Val] batch 55 | partial_loss=91.233124 | seen=880
+2025-09-16 13:46:39,176 - model2_train - INFO - [Val] batch 60 | partial_loss=104.854996 | seen=960
+2025-09-16 13:46:41,759 - model2_train - INFO - [Val] batch 65 | partial_loss=206.679382 | seen=1040
+2025-09-16 13:46:44,307 - model2_train - INFO - [Val] batch 70 | partial_loss=79.301880 | seen=1120
+2025-09-16 13:46:46,753 - model2_train - INFO - [Val] batch 75 | partial_loss=102.109062 | seen=1200
+2025-09-16 13:46:49,085 - model2_train - INFO - [Val] batch 80 | partial_loss=71.367500 | seen=1280
+2025-09-16 13:46:51,497 - model2_train - INFO - [Val] batch 85 | partial_loss=141.270615 | seen=1360
+2025-09-16 13:46:53,910 - model2_train - INFO - [Val] batch 90 | partial_loss=151.711868 | seen=1440
+2025-09-16 13:46:56,375 - model2_train - INFO - [Val] batch 95 | partial_loss=96.865623 | seen=1520
+2025-09-16 13:46:58,751 - model2_train - INFO - [Val] batch 100 | partial_loss=97.796249 | seen=1600
+2025-09-16 13:47:01,153 - model2_train - INFO - [Val] batch 105 | partial_loss=256.195618 | seen=1680
+2025-09-16 13:47:03,626 - model2_train - INFO - [Val] batch 110 | partial_loss=79.991249 | seen=1760
+2025-09-16 13:47:05,980 - model2_train - INFO - [Val] batch 115 | partial_loss=91.151878 | seen=1840
+2025-09-16 13:47:08,441 - model2_train - INFO - [Val] batch 120 | partial_loss=231.314377 | seen=1920
+2025-09-16 13:47:10,940 - model2_train - INFO - [Val] batch 125 | partial_loss=124.031250 | seen=2000
+2025-09-16 13:47:13,417 - model2_train - INFO - [Val] batch 130 | partial_loss=73.848747 | seen=2080
+2025-09-16 13:47:15,888 - model2_train - INFO - [Val] batch 135 | partial_loss=186.035614 | seen=2160
+2025-09-16 13:47:18,267 - model2_train - INFO - [Val] batch 140 | partial_loss=199.928741 | seen=2240
+2025-09-16 13:47:20,880 - model2_train - INFO - [Val] batch 145 | partial_loss=102.385040 | seen=2320
+2025-09-16 13:47:23,367 - model2_train - INFO - [Val] batch 150 | partial_loss=75.688751 | seen=2400
+2025-09-16 13:47:26,013 - model2_train - INFO - [Val] batch 155 | partial_loss=273.938110 | seen=2480
+2025-09-16 13:47:28,597 - model2_train - INFO - [Val] batch 160 | partial_loss=229.038116 | seen=2560
+2025-09-16 13:47:31,275 - model2_train - INFO - [Val] batch 165 | partial_loss=105.021873 | seen=2640
+2025-09-16 13:47:33,887 - model2_train - INFO - [Val] batch 170 | partial_loss=81.215317 | seen=2720
+2025-09-16 13:47:36,345 - model2_train - INFO - [Val] batch 175 | partial_loss=217.446243 | seen=2800
+2025-09-16 13:47:38,898 - model2_train - INFO - [Val] batch 180 | partial_loss=193.345001 | seen=2880
+2025-09-16 13:47:41,330 - model2_train - INFO - [Val] batch 185 | partial_loss=106.942497 | seen=2960
+2025-09-16 13:47:43,849 - model2_train - INFO - [Val] batch 190 | partial_loss=458.707489 | seen=3040
+2025-09-16 13:47:46,460 - model2_train - INFO - [Val] batch 195 | partial_loss=90.800003 | seen=3120
+2025-09-16 13:47:48,979 - model2_train - INFO - [Val] batch 200 | partial_loss=80.621254 | seen=3200
+2025-09-16 13:47:51,465 - model2_train - INFO - [Val] batch 205 | partial_loss=53.589378 | seen=3280
+2025-09-16 13:47:53,823 - model2_train - INFO - [Val] batch 210 | partial_loss=93.911255 | seen=3360
+2025-09-16 13:47:56,104 - model2_train - INFO - [Val] batch 215 | partial_loss=108.237503 | seen=3440
+2025-09-16 13:47:58,388 - model2_train - INFO - [Val] batch 220 | partial_loss=66.389999 | seen=3520
+2025-09-16 13:48:00,669 - model2_train - INFO - [Val] batch 225 | partial_loss=96.543121 | seen=3600
+2025-09-16 13:48:02,974 - model2_train - INFO - [Val] batch 230 | partial_loss=84.816879 | seen=3680
+2025-09-16 13:48:05,330 - model2_train - INFO - [Val] batch 235 | partial_loss=217.376892 | seen=3760
+2025-09-16 13:48:07,891 - model2_train - INFO - [Val] batch 240 | partial_loss=111.464996 | seen=3840
+2025-09-16 13:48:10,503 - model2_train - INFO - [Val] batch 245 | partial_loss=243.756317 | seen=3920
+2025-09-16 13:48:13,057 - model2_train - INFO - [Val] batch 250 | partial_loss=100.518127 | seen=4000
+2025-09-16 13:48:15,481 - model2_train - INFO - [Val] batch 255 | partial_loss=153.460007 | seen=4080
+2025-09-16 13:48:17,957 - model2_train - INFO - [Val] batch 260 | partial_loss=253.124374 | seen=4160
+2025-09-16 13:48:20,495 - model2_train - INFO - [Val] batch 265 | partial_loss=213.398132 | seen=4240
+2025-09-16 13:48:23,101 - model2_train - INFO - [Val] batch 270 | partial_loss=234.891876 | seen=4320
+2025-09-16 13:48:25,715 - model2_train - INFO - [Val] batch 275 | partial_loss=256.918121 | seen=4400
+2025-09-16 13:48:28,141 - model2_train - INFO - [Val] batch 280 | partial_loss=57.667503 | seen=4480
+2025-09-16 13:48:30,583 - model2_train - INFO - [Val] batch 285 | partial_loss=65.745003 | seen=4560
+2025-09-16 13:48:33,117 - model2_train - INFO - [Val] batch 290 | partial_loss=271.394379 | seen=4640
+2025-09-16 13:48:35,576 - model2_train - INFO - [Val] batch 295 | partial_loss=78.928123 | seen=4720
+2025-09-16 13:48:38,131 - model2_train - INFO - [Val] batch 300 | partial_loss=80.642502 | seen=4800
+2025-09-16 13:48:40,534 - model2_train - INFO - [Val] batch 305 | partial_loss=89.507507 | seen=4880
+2025-09-16 13:52:12,236 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 13:52:12,236 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 13:52:12,236 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 13:52:12,236 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-16 13:52:12,236 - model2_train - INFO - 🧭 模型目录（读取结构）: models/model2
+2025-09-16 13:52:12,236 - model2_train - INFO - 🧩 特征抽取: 优先 src.model1.predict.infer_embeddings；回退 HF @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:52:12,236 - model2_train - INFO - 📝 模型一配置(文本生成)路径: /home/liyakun/twitter-stock-prediction/configs/model1.yaml
+2025-09-16 13:52:12,256 - model2_train - INFO - ⚙️ 设备: cuda
+2025-09-16 13:52:12,343 - model2_train - WARNING - ⚠️ Debug 模式：训练仅使用前 100 条，验证仅使用前 100 条样本
+2025-09-16 13:52:12,343 - model2_train - INFO - 🧩 抽特征：回退 HuggingFace @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:52:18,806 - model2_train - INFO - 🧷 训练特征维度: 1536
+2025-09-16 13:52:21,422 - model2_train - INFO - 🧠 使用 HF 模型: Qwen2ForCausalLM
+2025-09-16 13:52:21,423 - model2_train - INFO - 🧱 训练策略：冻结 HF 主体，仅训练线性回归头
+2025-09-16 13:52:21,424 - model2_train - INFO - [y 统计] mean=120.4734, std=212.0081, min=16.1000, max=1145.4399, n=100
+2025-09-16 13:52:21,425 - model2_train - INFO - 
+【训练】开始第 1 轮
+2025-09-16 13:52:31,767 - model2_train - INFO - ✅ Epoch 1 完成 | 训练损失: 119.973355 | 用时 10.3s
+2025-09-16 13:52:34,397 - model2_train - INFO - [Val] batch 5 | partial_loss=96.861252 | seen=80
+2025-09-16 13:52:35,247 - model2_train - INFO - 🧪 验证损失: 110.902100
+2025-09-16 13:52:35,248 - model2_train - INFO - Epoch 1/3 | 训练损失=119.973355 | 验证损失=110.902100 | 最佳=nan ✅ 新最佳
+2025-09-16 13:52:35,248 - model2_train - INFO - 
+【训练】开始第 2 轮
+2025-09-16 13:52:45,527 - model2_train - INFO - ✅ Epoch 2 完成 | 训练损失: 119.973351 | 用时 10.3s
+2025-09-16 13:52:48,163 - model2_train - INFO - [Val] batch 5 | partial_loss=96.861252 | seen=80
+2025-09-16 13:52:49,021 - model2_train - INFO - 🧪 验证损失: 110.902100
+2025-09-16 13:52:49,021 - model2_train - INFO - Epoch 2/3 | 训练损失=119.973351 | 验证损失=110.902100 | 最佳=110.902100
+2025-09-16 13:52:49,022 - model2_train - INFO - 
+【训练】开始第 3 轮
+2025-09-16 13:52:59,324 - model2_train - INFO - ✅ Epoch 3 完成 | 训练损失: 119.973350 | 用时 10.3s
+2025-09-16 13:53:01,947 - model2_train - INFO - [Val] batch 5 | partial_loss=96.861252 | seen=80
+2025-09-16 13:53:02,797 - model2_train - INFO - 🧪 验证损失: 110.902100
+2025-09-16 13:53:02,797 - model2_train - INFO - Epoch 3/3 | 训练损失=119.973350 | 验证损失=110.902100 | 最佳=110.902100
+2025-09-16 13:53:02,895 - model2_train - INFO - 🎉 训练完成，已保存全程最佳模型 -> models/model2/best_model.pt (best val=110.902100)

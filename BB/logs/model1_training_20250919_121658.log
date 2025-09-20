@@ -1,0 +1,75 @@
+2025-09-19 12:16:58,302 - training - INFO - 🚀 开始运行训练脚本
+2025-09-19 12:16:58,333 - training - INFO - 📄 使用配置文件: configs/model1.yaml
+2025-09-19 12:18:03,657 - training - INFO - 🔍 加载训练数据集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-19 12:18:04,026 - training - INFO - 📊 训练样本数: 58994
+2025-09-19 12:18:04,027 - training - INFO - 🔍 加载验证数据集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-19 12:18:04,065 - training - INFO - 📊 验证集样本数: 12642
+2025-09-19 12:20:25,855 - training - INFO - Epoch 1 完成 | 平均损失: 9.0245 | 跳过批次: 0
+2025-09-19 12:20:25,856 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.000957489013671875
+2025-09-19 12:20:27,090 - training - INFO - Epoch 1 完成 | 平均损失: 9.0701 | 跳过批次: 0
+2025-09-19 12:20:27,091 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00146484375
+2025-09-19 12:20:28,098 - training - INFO - Epoch 1 完成 | 平均损失: 8.8336 | 跳过批次: 0
+2025-09-19 12:20:28,099 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00107574462890625
+2025-09-19 12:20:29,344 - training - INFO - Epoch 1 完成 | 平均损失: 8.8332 | 跳过批次: 0
+2025-09-19 12:20:29,345 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.0009918212890625
+2025-09-19 12:20:30,434 - training - INFO - Epoch 1 完成 | 平均损失: 8.8664 | 跳过批次: 0
+2025-09-19 12:20:30,435 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.0009918212890625
+2025-09-19 12:20:31,602 - training - INFO - Epoch 1 完成 | 平均损失: 8.7598 | 跳过批次: 0
+2025-09-19 12:20:31,603 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00115203857421875
+2025-09-19 12:20:32,573 - training - INFO - Epoch 1 完成 | 平均损失: 8.9231 | 跳过批次: 0
+2025-09-19 12:20:32,574 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.0022430419921875
+2025-09-19 12:20:32,576 - training - INFO - 🏁 Epoch 1 完成 | 平均损失: 8.9231 | 跳过批次: 0
+2025-09-19 12:21:24,460 - training - INFO - Epoch 1 验证损失: 46.5866
+2025-09-19 12:21:44,136 - training - INFO - 💾 保存最佳模型到: models/model1/best_model.pt (val_loss: 46.5866)
+2025-09-19 12:21:45,131 - training - INFO - Epoch 2 完成 | 平均损失: 8.7440 | 跳过批次: 0
+2025-09-19 12:21:45,132 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.001190185546875
+2025-09-19 12:21:46,307 - training - INFO - Epoch 2 完成 | 平均损失: 8.7617 | 跳过批次: 0
+2025-09-19 12:21:46,308 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00093841552734375
+2025-09-19 12:21:47,389 - training - INFO - Epoch 2 完成 | 平均损失: 8.8818 | 跳过批次: 0
+2025-09-19 12:21:47,390 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.0008087158203125
+2025-09-19 12:21:48,474 - training - INFO - Epoch 2 完成 | 平均损失: 8.9068 | 跳过批次: 0
+2025-09-19 12:21:48,475 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00099945068359375
+2025-09-19 12:21:49,734 - training - INFO - Epoch 2 完成 | 平均损失: 9.0341 | 跳过批次: 0
+2025-09-19 12:21:49,735 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00104522705078125
+2025-09-19 12:21:50,899 - training - INFO - Epoch 2 完成 | 平均损失: 8.8182 | 跳过批次: 0
+2025-09-19 12:21:50,900 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00118255615234375
+2025-09-19 12:21:51,668 - training - INFO - Epoch 2 完成 | 平均损失: 8.7715 | 跳过批次: 0
+2025-09-19 12:21:51,669 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.002593994140625
+2025-09-19 12:21:51,671 - training - INFO - 🏁 Epoch 2 完成 | 平均损失: 8.7715 | 跳过批次: 0
+2025-09-19 12:22:44,085 - training - INFO - Epoch 2 验证损失: 46.5866
+2025-09-19 12:22:44,085 - training - INFO - 当前验证损失 46.5866 ≥ 最佳 46.5866，不保存
+2025-09-19 12:22:45,168 - training - INFO - Epoch 3 完成 | 平均损失: 8.8320 | 跳过批次: 0
+2025-09-19 12:22:45,169 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.0009307861328125
+2025-09-19 12:22:46,381 - training - INFO - Epoch 3 完成 | 平均损失: 8.6743 | 跳过批次: 0
+2025-09-19 12:22:46,382 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00098419189453125
+2025-09-19 12:22:47,468 - training - INFO - Epoch 3 完成 | 平均损失: 8.6920 | 跳过批次: 0
+2025-09-19 12:22:47,469 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00119781494140625
+2025-09-19 12:22:48,478 - training - INFO - Epoch 3 完成 | 平均损失: 8.6556 | 跳过批次: 0
+2025-09-19 12:22:48,479 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.00103759765625
+2025-09-19 12:22:49,649 - training - INFO - Epoch 3 完成 | 平均损失: 8.6048 | 跳过批次: 0
+2025-09-19 12:22:49,650 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.0009307861328125
+2025-09-19 12:22:50,908 - training - INFO - Epoch 3 完成 | 平均损失: 8.7686 | 跳过批次: 0
+2025-09-19 12:22:50,909 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.000896453857421875
+2025-09-19 12:22:51,687 - training - INFO - Epoch 3 完成 | 平均损失: 8.8790 | 跳过批次: 0
+2025-09-19 12:22:51,688 - training - INFO - 层 base_model.model.score.modules_to_save.default.weight 梯度最大值: 0.0022735595703125
+2025-09-19 12:22:51,690 - training - INFO - 🏁 Epoch 3 完成 | 平均损失: 8.8790 | 跳过批次: 0
+2025-09-19 12:23:44,441 - training - INFO - Epoch 3 验证损失: 46.5866
+2025-09-19 12:23:44,441 - training - INFO - 当前验证损失 46.5866 ≥ 最佳 46.5866，不保存
+2025-09-19 12:23:44,444 - training - INFO - 🏁 Epoch 完成 | 平均损失: 8.879031 | 跳过批次: 0
+2025-09-19 12:24:03,995 - training - INFO - 🧪 开始测试阶段...
+2025-09-19 12:24:03,995 - training - INFO - 🧪 测试文件数: 1
+2025-09-19 12:24:04,061 - training - INFO -   ✔ 载入测试集: /home/liyakun/twitter-stock-prediction/data/processed/test_dataset.csv | 样本=12642
+2025-09-19 12:24:10,838 - training - INFO - 🔄 测试进度: 100/791 批次
+2025-09-19 12:24:17,544 - training - INFO - 🔄 测试进度: 200/791 批次
+2025-09-19 12:24:24,515 - training - INFO - 🔄 测试进度: 300/791 批次
+2025-09-19 12:24:31,378 - training - INFO - 🔄 测试进度: 400/791 批次
+2025-09-19 12:24:38,048 - training - INFO - 🔄 测试进度: 500/791 批次
+2025-09-19 12:24:44,303 - training - INFO - 🔄 测试进度: 600/791 批次
+2025-09-19 12:24:50,949 - training - INFO - 🔄 测试进度: 700/791 批次
+2025-09-19 12:24:57,342 - training - INFO - 📊 测试指标：
+2025-09-19 12:24:57,342 - training - INFO -   • MAE  = 157.856445
+2025-09-19 12:24:57,342 - training - INFO -   • RMSE = 273.010895
+2025-09-19 12:24:57,342 - training - INFO -   • 方向准确率 = 18.44%
+2025-09-19 12:24:57,385 - training - INFO - ✅ 保存结构化输出数据到: data/processed/model1_output/predictions_20250919_122457.csv
+2025-09-19 12:24:57,385 - training - INFO - 💾 已保存测试预测到: data/processed/model1_output/predictions_20250919_122457.csv
+2025-09-19 12:24:57,385 - training - INFO - 📝 已保存评估摘要到: results/model1_eval/evaluation_20250919_122457.json

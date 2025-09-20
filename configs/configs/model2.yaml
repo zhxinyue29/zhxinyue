@@ -16,8 +16,6 @@ paths:
   # 模型和输出路径
   eval_output_dir: "results/model1_eval"
   eval_output_path: 'results/model1_eval/evaluation_results.csv'
-  model2_dir: models/model2
-  model1_config: /home/liyakun/twitter-stock-prediction/configs/model1.yaml
 env:
   prediction_model_path: models/model2/best_model.pt
   tokenizer_dir: /home/liyakun/LLaMA-Factory-main/deepseek1.5B

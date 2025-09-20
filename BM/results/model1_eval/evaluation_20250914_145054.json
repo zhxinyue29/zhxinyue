@@ -1,0 +1,9 @@
+{
+    "MAE": 156.0659637451172,
+    "RMSE": 271.9806823730469,
+    "Direction_Accuracy": 0.9808574592627749,
+    "num_samples": 12642,
+    "test_files": [
+        "/home/liyakun/twitter-stock-prediction/data/processed/test_dataset.csv"
+    ]
+}

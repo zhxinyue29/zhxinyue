@@ -1,0 +1,17 @@
+2025-09-16 13:42:26,423 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 13:42:26,423 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 13:42:26,423 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 13:42:26,423 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-16 13:42:26,423 - model2_train - INFO - 🧭 模型目录（读取结构）: models/model2
+2025-09-16 13:42:26,423 - model2_train - INFO - 🧩 特征抽取: 优先 src.model1.predict.infer_embeddings；回退 HF @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:42:26,423 - model2_train - INFO - 📝 模型一配置(文本生成)路径: /home/liyakun/twitter-stock-prediction/configs/model1.yaml
+2025-09-16 13:42:26,441 - model2_train - INFO - ⚙️ 设备: cuda
+2025-09-16 13:42:26,528 - model2_train - WARNING - ⚠️ Debug 模式：仅使用前 100 条训练样本
+2025-09-16 13:42:26,528 - model2_train - INFO - 🧩 抽特征：回退 HuggingFace @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:42:33,491 - model2_train - INFO - 🧷 训练特征维度: 1536
+2025-09-16 13:42:36,086 - model2_train - INFO - 🧠 使用 HF 模型: Qwen2ForCausalLM
+2025-09-16 13:42:36,087 - model2_train - INFO - 🧱 训练策略：冻结 HF 主体，仅训练线性回归头
+2025-09-16 13:42:36,089 - model2_train - INFO - [y 统计] mean=120.4734, std=212.0081, min=16.1000, max=1145.4399, n=100
+2025-09-16 13:42:36,089 - model2_train - INFO - 
+【训练】开始第 1 轮
+2025-09-16 13:42:46,228 - model2_train - INFO - ✅ Epoch 1 完成 | 训练损失: 119.973351 | 用时 10.1s

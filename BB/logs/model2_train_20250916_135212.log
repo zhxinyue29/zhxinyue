@@ -1,0 +1,33 @@
+2025-09-16 13:52:12,236 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 13:52:12,236 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 13:52:12,236 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 13:52:12,236 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv
+2025-09-16 13:52:12,236 - model2_train - INFO - 🧭 模型目录（读取结构）: models/model2
+2025-09-16 13:52:12,236 - model2_train - INFO - 🧩 特征抽取: 优先 src.model1.predict.infer_embeddings；回退 HF @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:52:12,236 - model2_train - INFO - 📝 模型一配置(文本生成)路径: /home/liyakun/twitter-stock-prediction/configs/model1.yaml
+2025-09-16 13:52:12,256 - model2_train - INFO - ⚙️ 设备: cuda
+2025-09-16 13:52:12,343 - model2_train - WARNING - ⚠️ Debug 模式：训练仅使用前 100 条，验证仅使用前 100 条样本
+2025-09-16 13:52:12,343 - model2_train - INFO - 🧩 抽特征：回退 HuggingFace @ /home/liyakun/LLaMA-Factory-main/deepseek1.5B
+2025-09-16 13:52:18,806 - model2_train - INFO - 🧷 训练特征维度: 1536
+2025-09-16 13:52:21,422 - model2_train - INFO - 🧠 使用 HF 模型: Qwen2ForCausalLM
+2025-09-16 13:52:21,423 - model2_train - INFO - 🧱 训练策略：冻结 HF 主体，仅训练线性回归头
+2025-09-16 13:52:21,424 - model2_train - INFO - [y 统计] mean=120.4734, std=212.0081, min=16.1000, max=1145.4399, n=100
+2025-09-16 13:52:21,425 - model2_train - INFO - 
+【训练】开始第 1 轮
+2025-09-16 13:52:31,767 - model2_train - INFO - ✅ Epoch 1 完成 | 训练损失: 119.973355 | 用时 10.3s
+2025-09-16 13:52:34,397 - model2_train - INFO - [Val] batch 5 | partial_loss=96.861252 | seen=80
+2025-09-16 13:52:35,247 - model2_train - INFO - 🧪 验证损失: 110.902100
+2025-09-16 13:52:35,248 - model2_train - INFO - Epoch 1/3 | 训练损失=119.973355 | 验证损失=110.902100 | 最佳=nan ✅ 新最佳
+2025-09-16 13:52:35,248 - model2_train - INFO - 
+【训练】开始第 2 轮
+2025-09-16 13:52:45,527 - model2_train - INFO - ✅ Epoch 2 完成 | 训练损失: 119.973351 | 用时 10.3s
+2025-09-16 13:52:48,163 - model2_train - INFO - [Val] batch 5 | partial_loss=96.861252 | seen=80
+2025-09-16 13:52:49,021 - model2_train - INFO - 🧪 验证损失: 110.902100
+2025-09-16 13:52:49,021 - model2_train - INFO - Epoch 2/3 | 训练损失=119.973351 | 验证损失=110.902100 | 最佳=110.902100
+2025-09-16 13:52:49,022 - model2_train - INFO - 
+【训练】开始第 3 轮
+2025-09-16 13:52:59,324 - model2_train - INFO - ✅ Epoch 3 完成 | 训练损失: 119.973350 | 用时 10.3s
+2025-09-16 13:53:01,947 - model2_train - INFO - [Val] batch 5 | partial_loss=96.861252 | seen=80
+2025-09-16 13:53:02,797 - model2_train - INFO - 🧪 验证损失: 110.902100
+2025-09-16 13:53:02,797 - model2_train - INFO - Epoch 3/3 | 训练损失=119.973350 | 验证损失=110.902100 | 最佳=110.902100
+2025-09-16 13:53:02,895 - model2_train - INFO - 🎉 训练完成，已保存全程最佳模型 -> models/model2/best_model.pt (best val=110.902100)

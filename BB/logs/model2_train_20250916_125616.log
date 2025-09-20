@@ -1,0 +1,4 @@
+2025-09-16 12:56:16,240 - model2_train - DEBUG - 日志写入: logs/model2_train.log
+2025-09-16 12:56:16,241 - model2_train - INFO - 📄 使用配置: /home/liyakun/twitter-stock-prediction/configs/model2.yaml
+2025-09-16 12:56:16,241 - model2_train - INFO - 📁 训练集: /home/liyakun/twitter-stock-prediction/data/processed/train_dataset.csv
+2025-09-16 12:56:16,241 - model2_train - INFO - 📁 验证集: /home/liyakun/twitter-stock-prediction/data/processed/val_dataset.csv

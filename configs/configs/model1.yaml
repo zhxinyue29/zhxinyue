@@ -31,7 +31,6 @@ paths:
   processed_output_dir: "data/processed/model1_output"
   eval_output_dir: "results/model1_eval"
   eval_output_path: 'results/model1_eval/evaluation_results.csv'
-  model1_dir: models/model1
 
 predict:
   steps: 1000  # 预测步数

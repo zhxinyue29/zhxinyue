@@ -1,0 +1,42 @@
+[
+  {
+    "input_text": "tradewithjoe: Scanning For Doubles -[URL]$SPY  $IWM  $AAPL  $DIA  $GDX  $BABA  $FB  $NFLX  $GOOGL  $TSLA  $UVXY  $BIDU  $YHOO  $USO …",
+    "output_text": "矩阵行和: 5.3409",
+    "output_matrix_shape": [
+      50
+    ],
+    "output_matrix_sum": 5.340946197509766
+  },
+  {
+    "input_text": "$SPX  set best month in 4 years [URL] via @Reuters $FB  $INTC  $MSFT  $NVDA  *MOORE $SMH  IT'S THE CHIPS, STUPID! 🤔™ #IoT #IoE",
+    "output_text": "矩阵行和: 6.1105",
+    "output_matrix_shape": [
+      50
+    ],
+    "output_matrix_sum": 6.1105122566223145
+  },
+  {
+    "input_text": "@DIRT2GOLD @naomihn2000 @gene70 @Chrisyahahha @dave_meadows $CHK  needs an #icahn $IEP  bailout very soon. Buyout and take private",
+    "output_text": "矩阵行和: -3.0657",
+    "output_matrix_shape": [
+      50
+    ],
+    "output_matrix_sum": -3.0656538009643555
+  },
+  {
+    "input_text": "My Friend Made $4  Million Trading Like this! [URL] .. $UNH  $HUM  $CI",
+    "output_text": "矩阵行和: 3.8451",
+    "output_matrix_shape": [
+      50
+    ],
+    "output_matrix_sum": 3.845095157623291
+  },
+  {
+    "input_text": "@TheStreet @jimcramer  incompetent &amp; greedy management at $UNH . Industry wants profits, gov take losses insuring sick. Time for #singlepayer",
+    "output_text": "矩阵行和: 5.2020",
+    "output_matrix_shape": [
+      50
+    ],
+    "output_matrix_sum": 5.201971530914307
+  }
+]
